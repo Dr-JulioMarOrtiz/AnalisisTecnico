@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Analisis Tecnico · Propti Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:    #1A3A5C;
+    --navy2:   #243F5E;
+    --blue:    #2E75B6;
+    --blue2:   #4A92D0;
+    --orange:  #E8943A;
+    --orange2: #F0A84E;
+    --white:   #FFFFFF;
+    --off:     #F4F7FB;
+    --border:  #D0DFF0;
+    --gray:    #4A5568;
+    --lgray:   #8A9AB5;
+    --success: #27AE60;
+    --danger:  #E74C3C;
+    --shadow:  0 4px 24px rgba(26,58,92,.10);
+    --shadow2: 0 8px 40px rgba(26,58,92,.15);
+    --radius:  12px;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --font-body: 'Lato', sans-serif;
+    --transition: .22s cubic-bezier(.4,0,.2,1);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: #EEF3FB; color: var(--gray); min-height: 100vh; line-height: 1.6; }
+
+  #app { display: flex; min-height: 100vh; }
+
+  aside {
+    width: 256px; min-height: 100vh; background: var(--navy);
+    display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0;
+    z-index: 100; overflow-y: auto;
+  }
+  .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar-brand .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--orange); text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .sidebar-brand h1 { font-family: var(--font-head); font-size: 17px; font-weight: 800; color: #fff; line-height: 1.3; }
+  .sidebar-brand p { font-size: 11px; color: var(--lgray); margin-top: 4px; }
+
+  nav { flex: 1; padding: 16px 0; }
+  .nav-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; color: var(--lgray); text-transform: uppercase; padding: 8px 24px 4px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 24px; cursor: pointer; border: none; background: none;
+    width: 100%; text-align: left; color: rgba(255,255,255,.65);
+    font-family: var(--font-body); font-size: 13.5px;
+    transition: var(--transition); border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-item.active { background: rgba(232,148,58,.12); color: #fff; border-left-color: var(--orange); }
+  .nav-item .icon { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; transition: var(--transition); }
+  .nav-item.active .icon { background: var(--orange); }
+  .nav-num { font-family: var(--font-mono); font-size: 10px; color: var(--lgray); margin-left: auto; }
+  .nav-item.active .nav-num { color: var(--orange); }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--lgray); font-family: var(--font-mono); }
+
+  main { margin-left: 256px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 36px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 8px rgba(26,58,92,.06); }
+  .topbar-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--navy); }
+  .topbar-sub { font-family: var(--font-mono); font-size: 11px; color: var(--lgray); margin-top: 1px; }
+  .reset-btn { display: flex; align-items: center; gap: 7px; background: var(--off); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 12px; font-family: var(--font-mono); color: var(--gray); cursor: pointer; transition: var(--transition); }
+  .reset-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  .panel { display: none; padding: 32px 36px; animation: fadeIn .25s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .panel-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
+  .panel-icon { width: 52px; height: 52px; border-radius: 14px; background: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .panel-title { font-family: var(--font-head); font-size: 24px; font-weight: 800; color: var(--navy); }
+  .panel-desc { font-size: 13.5px; color: var(--lgray); margin-top: 3px; }
+  .module-tag { display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; background: var(--orange); color: #fff; border-radius: 4px; padding: 2px 8px; margin-bottom: 6px; text-transform: uppercase; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .col-span-2 { grid-column: span 2; }
+
+  .card { background: #fff; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+  .card-header { padding: 14px 20px 12px; border-bottom: 1px solid var(--border); background: var(--off); display: flex; align-items: center; gap: 10px; }
+  .card-header h3 { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--navy); }
+  .card-header .badge { font-family: var(--font-mono); font-size: 10px; background: var(--navy); color: #fff; border-radius: 4px; padding: 2px 7px; margin-left: auto; }
+  .card-body { padding: 20px; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 5px; font-family: var(--font-mono); letter-spacing: .3px; }
+  .field label .hint { font-weight: 400; color: var(--lgray); font-size: 11px; margin-left: 4px; }
+  .field input[type=number], .field input[type=text], .field select { width: 100%; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 13.5px; color: var(--navy); background: #fff; transition: var(--transition); outline: none; -moz-appearance: textfield; }
+  .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(46,117,182,.12); }
+  .field input[readonly] { background: var(--off); color: var(--blue); font-weight: 500; cursor: default; border-color: #C5D8F0; }
+
+  .result-row { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  .result-box { flex: 1; min-width: 130px; background: var(--navy); border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .result-box.orange { background: var(--orange); }
+  .result-box.success { background: var(--success); }
+  .result-box.blue { background: var(--blue); }
+  .result-box.danger { background: var(--danger); }
+  .result-box .rb-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,.7); text-transform: uppercase; margin-bottom: 4px; }
+  .result-box .rb-value { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: #fff; line-height: 1.2; }
+  .result-box .rb-unit { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,.65); margin-top: 2px; }
+
+  .stat-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; box-shadow: var(--shadow); }
+  .stat-card .sc-icon { font-size: 20px; margin-bottom: 8px; }
+  .stat-card .sc-val { font-family: var(--font-mono); font-size: 26px; font-weight: 500; color: var(--navy); line-height: 1; }
+  .stat-card .sc-label { font-size: 11px; color: var(--lgray); margin-top: 5px; }
+  .stat-card .sc-sub { font-family: var(--font-mono); font-size: 11px; color: var(--orange); }
+
+  .formula { background: var(--off); border: 1px dashed var(--border); border-radius: 8px; padding: 10px 14px; font-family: var(--font-mono); font-size: 12.5px; color: var(--navy); margin: 12px 0; }
+  .formula .f-label { font-size: 10px; color: var(--lgray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .alert { border-radius: 8px; padding: 12px 16px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; }
+  .alert.info { background: #EBF5FB; border: 1px solid #AED6F1; color: #1A5276; }
+  .alert.warn { background: #FEF9E7; border: 1px solid #F9E79F; color: #784212; }
+  .alert.good { background: #EAFAF1; border: 1px solid #A9DFBF; color: #1E8449; }
+  .alert.bad  { background: #FDEDEC; border: 1px solid #F5B7B1; color: #922B21; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table th { background: var(--navy); color: #fff; font-family: var(--font-mono); font-size: 11px; letter-spacing: .5px; padding: 9px 12px; text-align: left; font-weight: 500; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .cost-table tr:nth-child(even) td { background: var(--off); }
+  .cost-table tfoot td { font-family: var(--font-mono); font-weight: 500; color: var(--navy); background: #D6E8F7; border-top: 2px solid var(--blue); }
+  .cost-table input[type=number], .cost-table input[type=text] { width: 100%; padding: 6px 9px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--navy); background: #fff; outline: none; -moz-appearance: textfield; }
+  .cost-table input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(46,117,182,.12); }
+  .cost-table .total-cell { font-family: var(--font-mono); font-size: 12.5px; color: var(--blue); font-weight: 500; }
+  .delete-row { background: none; border: none; cursor: pointer; color: var(--lgray); font-size: 15px; padding: 2px 5px; border-radius: 4px; transition: var(--transition); }
+  .delete-row:hover { background: #FDEDEC; color: var(--danger); }
+
+  .add-row-btn { width: 100%; padding: 9px; background: none; border: 1.5px dashed var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--lgray); cursor: pointer; margin-top: 8px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .add-row-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(46,117,182,.04); }
+
+  .calc-btn { width: 100%; padding: 13px; background: var(--navy); color: #fff; border: none; border-radius: 10px; font-family: var(--font-head); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .calc-btn:hover { background: var(--blue); transform: translateY(-1px); box-shadow: var(--shadow2); }
+  .calc-btn.orange { background: var(--orange); }
+  .calc-btn.orange:hover { background: var(--orange2); }
+
+  .gantt-wrapper { overflow-x: auto; }
+  .gantt-table { border-collapse: collapse; min-width: 700px; width: 100%; }
+  .gantt-table th { background: var(--navy); color: #fff; font-family: var(--font-mono); font-size: 10px; letter-spacing: .5px; padding: 8px 6px; text-align: center; }
+  .gantt-table td { padding: 5px; border: 1px solid var(--border); }
+  .gantt-table td:first-child { font-family: var(--font-mono); font-size: 12px; color: var(--navy); padding: 5px 10px; background: var(--off); white-space: nowrap; }
+  .gantt-cell { width: 100%; height: 26px; border-radius: 4px; cursor: pointer; background: #fff; border: 1px solid var(--border); transition: background .15s; display: block; }
+  .gantt-cell.active { background: var(--blue); border-color: var(--blue); }
+  .gantt-input { width: 100%; background: none; border: none; font-family: var(--font-mono); font-size: 12px; color: var(--navy); outline: none; padding: 0; }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { font-family: var(--font-mono); font-size: 11px; color: var(--gray); min-width: 130px; text-align: right; }
+  .bar-track { flex: 1; height: 22px; background: var(--off); border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 5px; transition: width .6s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+  .bar-fill span { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,.9); }
+
+  .summary-section { background: var(--navy); border-radius: 14px; padding: 24px; color: #fff; margin-bottom: 20px; }
+  .summary-section h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--orange2); }
+  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .sr-label { font-size: 13px; color: rgba(255,255,255,.75); }
+  .summary-row .sr-val { font-family: var(--font-mono); font-size: 14px; color: #fff; font-weight: 500; }
+  .summary-row .sr-val.orange { color: var(--orange2); }
+
+  .chart-wrap { background: #fff; border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow); }
+  .chart-wrap h4 { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    aside { width: 220px; } main { margin-left: 220px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .panel { padding: 20px 18px; } .topbar { padding: 14px 18px; }
+  }
+  @media (max-width: 640px) { aside { display: none; } main { margin-left: 0; } }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     ACCESS GATE  —  Pantalla de acceso con clave
+     ════════════════════════════════════════════════════════════ -->
+<style>
+/* ── RESET GATE SCOPE ── */
+#gate-overlay *{box-sizing:border-box;margin:0;padding:0}
+
+#gate-overlay{
+  position:fixed;inset:0;z-index:99999;
+  display:flex;align-items:center;justify-content:center;
+  background:#0D1E30;
+  font-family:'Syne','Segoe UI',sans-serif;
+  overflow:auto;
+}
+
+/* animated mesh background */
+#gate-overlay::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 20% 30%, rgba(46,117,182,.22) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 70%, rgba(232,148,58,.15) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 80% at 50% 10%, rgba(26,58,92,.40) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* floating geometric accents */
+#gate-overlay::after{
+  content:'';position:fixed;
+  width:400px;height:400px;
+  border:1px solid rgba(46,117,182,.12);
+  border-radius:50%;
+  top:-100px;right:-100px;
+  pointer-events:none;
+  animation:gateRotate 20s linear infinite;
+}
+@keyframes gateRotate{to{transform:rotate(360deg);}}
+
+.gate-card{
+  position:relative;z-index:1;
+  width:100%;max-width:480px;
+  margin:24px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:24px;
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  overflow:hidden;
+  animation:gateSlide .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes gateSlide{
+  from{opacity:0;transform:translateY(40px) scale(.96)}
+  to  {opacity:1;transform:none}
+}
+
+/* top accent bar */
+.gate-topbar{
+  height:4px;
+  background:linear-gradient(90deg,#1A3A5C,#2E75B6 40%,#E8943A 70%,#F0A84E);
+}
+
+.gate-body{padding:44px 40px 40px;}
+
+/* ── LOGO ZONE ── */
+.gate-logo-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  margin-bottom:32px;
+  text-align:center;
+}
+.gate-logo-circle{
+  width:88px;height:88px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#1A3A5C 0%,#2E75B6 100%);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;
+  box-shadow:0 8px 32px rgba(46,117,182,.35);
+  position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+.gate-logo-circle::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);
+}
+.gate-logo-img{
+  width:72px;height:72px;object-fit:contain;
+  border-radius:16px;
+  display:none; /* shown when src is set */
+}
+.gate-logo-emoji{font-size:40px;line-height:1;}
+.gate-org-name{
+  font-size:18px;font-weight:800;color:#fff;
+  letter-spacing:.5px;margin-bottom:4px;
+}
+.gate-org-sub{
+  font-size:12px;color:rgba(255,255,255,.45);
+  font-family:'DM Sans','Lato',sans-serif;
+  letter-spacing:.3px;
+}
+
+/* ── DIVIDER ── */
+.gate-divider{
+  display:flex;align-items:center;gap:12px;margin:0 0 28px;
+}
+.gate-divider-line{flex:1;height:1px;background:rgba(255,255,255,.10);}
+.gate-divider-text{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:1px;white-space:nowrap;font-family:monospace;}
+
+/* ── FORM ── */
+.gate-label{
+  display:block;
+  font-size:11px;font-weight:700;
+  color:rgba(255,255,255,.55);
+  letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.gate-input-wrap{position:relative;margin-bottom:8px;}
+.gate-input{
+  width:100%;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:14px 48px 14px 18px;
+  font-size:16px;font-family:monospace;
+  color:#fff;letter-spacing:2px;
+  outline:none;
+  transition:border-color .2s,background .2s;
+}
+.gate-input::placeholder{letter-spacing:0;font-family:'DM Sans',sans-serif;font-size:14px;color:rgba(255,255,255,.25);}
+.gate-input:focus{
+  border-color:rgba(46,117,182,.7);
+  background:rgba(46,117,182,.08);
+  box-shadow:0 0 0 4px rgba(46,117,182,.15);
+}
+.gate-eye{
+  position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,255,255,.35);font-size:18px;
+  padding:4px;transition:color .2s;
+}
+.gate-eye:hover{color:rgba(255,255,255,.7);}
+
+.gate-error{
+  display:none;
+  background:rgba(231,76,60,.15);
+  border:1px solid rgba(231,76,60,.3);
+  border-radius:8px;padding:10px 14px;
+  font-size:13px;color:#FF8A80;
+  margin-bottom:16px;
+  font-family:'DM Sans',sans-serif;
+  animation:shake .35s ease;
+}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.gate-btn{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,#2E75B6,#1A3A5C);
+  border:none;border-radius:12px;
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  color:#fff;cursor:pointer;
+  transition:all .2s;margin-top:8px;
+  position:relative;overflow:hidden;
+}
+.gate-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.gate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,117,182,.4);}
+.gate-btn:hover::before{opacity:1;}
+.gate-btn:active{transform:none;}
+
+/* ── HINT (groups) ── */
+.gate-hint{
+  margin-top:20px;text-align:center;
+  font-size:12px;color:rgba(255,255,255,.3);
+  font-family:'DM Sans',sans-serif;line-height:1.6;
+}
+.gate-hint strong{color:rgba(255,255,255,.5);}
+
+/* ── ADMIN BADGE (shown after master key) ── */
+.gate-admin-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(232,148,58,.15);
+  border:1px solid rgba(232,148,58,.3);
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;color:#F0A84E;font-weight:700;
+  letter-spacing:.5px;margin-top:12px;
+  font-family:monospace;text-transform:uppercase;
+}
+
+/* ── SESSION BAR (shows after login) ── */
+#session-bar{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(26,58,92,.95);
+  border-top:1px solid rgba(46,117,182,.3);
+  backdrop-filter:blur(12px);
+  padding:8px 20px;
+  z-index:9000;
+  align-items:center;gap:12px;
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;color:rgba(255,255,255,.5);
+}
+#session-bar.visible{display:flex;}
+#session-bar .sb-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#27AE60;flex-shrink:0;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#session-bar .sb-name{color:rgba(255,255,255,.8);font-weight:600;}
+#session-bar .sb-logout{
+  margin-left:auto;background:rgba(231,76,60,.15);
+  border:1px solid rgba(231,76,60,.25);
+  border-radius:6px;padding:4px 10px;
+  color:#FF8A80;cursor:pointer;font-size:11px;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+#session-bar .sb-logout:hover{background:rgba(231,76,60,.3);}
+</style>
+
+<!-- ── GATE OVERLAY ── -->
+<div id="gate-overlay">
+  <div class="gate-card">
+    <div class="gate-topbar"></div>
+    <div class="gate-body">
+
+      <!-- LOGO -->
+      <div class="gate-logo-wrap">
+        <div class="gate-logo-circle" id="gate-logo-circle">
+          <!-- If a logo image is configured, it shows here; otherwise the emoji -->
+          <img id="gate-logo-img" class="gate-logo-img" src="" alt="Logo">
+          <span id="gate-logo-emoji" class="gate-logo-emoji">🏭</span>
+        </div>
+        <div class="gate-org-name" id="gate-org-name">Propti Analytics</div>
+        <div class="gate-org-sub" id="gate-org-sub">Programa de Formación Emprendedora</div>
+      </div>
+
+      <div class="gate-divider">
+        <div class="gate-divider-line"></div>
+        <div class="gate-divider-text">ACCESO SEGURO</div>
+        <div class="gate-divider-line"></div>
+      </div>
+
+      <!-- TOOL NAME -->
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:4px">
+          Calculadora de Producción
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.4);font-family:'DM Sans',sans-serif">
+          Curso-Taller · Analisis Tecnico
+        </div>
+      </div>
+
+      <!-- ERROR MSG -->
+      <div class="gate-error" id="gate-error">
+        🔒 Clave incorrecta. Verifica con tu facilitador e intenta de nuevo.
+      </div>
+
+      <!-- INPUT -->
+      <label class="gate-label" for="gate-pwd">Clave de acceso</label>
+      <div class="gate-input-wrap">
+        <input
+          type="password"
+          id="gate-pwd"
+          class="gate-input"
+          placeholder="Ingresa tu clave del grupo…"
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter')gateLogin()"
+          oninput="document.getElementById('gate-error').style.display='none'"
+        >
+        <button class="gate-eye" onclick="togglePwd()" title="Mostrar/Ocultar">👁</button>
+      </div>
+
+      <button class="gate-btn" onclick="gateLogin()">
+        Ingresar a la herramienta &nbsp;→
+      </button>
+
+      <div class="gate-hint" id="gate-hint">
+        Solicita tu clave de acceso al facilitador.<br>
+        <strong>¿Eres facilitador?</strong> Usa la clave maestra.
+      </div>
+
+    </div><!-- /gate-body -->
+  </div><!-- /gate-card -->
+</div><!-- /gate-overlay -->
+
+<!-- ── SESSION BAR ── -->
+<div id="session-bar">
+  <div class="sb-dot"></div>
+  <span>Sesión activa:</span>
+  <span class="sb-name" id="sb-name">—</span>
+  <span id="sb-role" style="font-size:11px;color:rgba(255,255,255,.4)"></span>
+  <button class="sb-logout" onclick="gateLockout()">Cerrar sesión</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   CONFIGURACIÓN DE ACCESO
+   ════════════════════════════════════════════════════
+   Personaliza estos valores antes de publicar.
+   ─────────────────────────────────────────────────── */
+const GATE_CONFIG = {
+  /* Nombre de tu organización (aparece en la pantalla) */
+  orgName: "Propti Analytics",
+  orgSub:  "Programa de Formación Emprendedora",
+
+  /* Emoji del logo (se usa si no hay imagen) */
+  logoEmoji: "🏭",
+
+  /* URL de tu logo (deja "" para usar el emoji) */
+  /* Ejemplo: logoUrl: "https://tudominio.com/logo.png" */
+  logoUrl: "",
+
+  /* ── CLAVE MAESTRA del facilitador ── */
+  masterKey: {
+    password: "FACILITADOR2025",   /* ← CAMBIA ESTO */
+    label:    "Facilitador / Admin",
+    badge:    "🔑 ADMIN"
+  },
+
+  /* ── CLAVES POR GRUPO ──
+     Agrega o elimina grupos según tus necesidades.
+     Cada grupo tiene:
+       password : clave que escriben los alumnos
+       label    : nombre que aparece en la barra de sesión
+  */
+  groups: [
+    { password: "GRUPO-A-2025",   label: "Grupo A · Turno Matutino" },
+    { password: "GRUPO-B-2025",   label: "Grupo B · Turno Vespertino" },
+    { password: "GRUPO-C-2025",   label: "Grupo C · Turno Sabatino" },
+    { password: "EMPRENDEDOR01",  label: "Acceso Individual · Demo" },
+  ]
+};
+/* ════════════════════════════════════════════════════ */
+
+/* Apply branding from config */
+document.getElementById('gate-org-name').textContent = GATE_CONFIG.orgName;
+document.getElementById('gate-org-sub').textContent  = GATE_CONFIG.orgSub;
+document.getElementById('gate-logo-emoji').textContent = GATE_CONFIG.logoEmoji;
+
+if (GATE_CONFIG.logoUrl) {
+  const img = document.getElementById('gate-logo-img');
+  img.src = GATE_CONFIG.logoUrl;
+  img.style.display = 'block';
+  document.getElementById('gate-logo-emoji').style.display = 'none';
+}
+
+function gateLogin() {
+  const input = document.getElementById('gate-pwd').value.trim().toUpperCase();
+  const err   = document.getElementById('gate-error');
+
+  /* Check master key */
+  if (input === GATE_CONFIG.masterKey.password.toUpperCase()) {
+    gateUnlock(GATE_CONFIG.masterKey.label, true);
+    return;
+  }
+
+  /* Check group keys */
+  const group = GATE_CONFIG.groups.find(g =>
+    input === g.password.toUpperCase()
+  );
+  if (group) {
+    gateUnlock(group.label, false);
+    return;
+  }
+
+  /* Failed */
+  err.style.display = 'block';
+  document.getElementById('gate-pwd').value = '';
+  document.getElementById('gate-pwd').focus();
+  /* wiggle the card */
+  const card = document.querySelector('.gate-card');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'gateShakeCard .4s ease';
+}
+
+function gateUnlock(label, isAdmin) {
+  /* Hide overlay with fade */
+  const overlay = document.getElementById('gate-overlay');
+  overlay.style.transition = 'opacity .4s ease';
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+  setTimeout(() => overlay.style.display = 'none', 420);
+
+  /* Show session bar */
+  document.getElementById('sb-name').textContent = label;
+  document.getElementById('sb-role').textContent = isAdmin ? ' · 🔑 Admin' : '';
+  document.getElementById('session-bar').classList.add('visible');
+
+  /* Add bottom padding so content is not hidden behind bar */
+  document.body.style.paddingBottom = '44px';
+}
+
+function gateLockout() {
+  if (!confirm('¿Cerrar sesión y regresar a la pantalla de acceso?')) return;
+  location.reload();
+}
+
+function togglePwd() {
+  const inp = document.getElementById('gate-pwd');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+/* Extra animation for wrong password */
+const style = document.createElement('style');
+style.textContent = `@keyframes gateShakeCard{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}`;
+document.head.appendChild(style);
+</script>
+
+<div id="app">
+
+<aside>
+  <div class="sidebar-brand">
+    <span class="tag">⚙ Herramienta de cálculo</span>
+    <h1>Calculadora de Análisis Técnico</h1>
+    <p>Propti Analytics</p>
+  </div>
+  <nav>
+    <div class="nav-label">Módulos</div>
+    <button class="nav-item active" onclick="showPanel('home',this)"><span class="icon">🏠</span> Inicio / Resumen <span class="nav-num">00</span></button>
+    <button class="nav-item" onclick="showPanel('ci',this)"><span class="icon">🏭</span> Capacidad Instalada <span class="nav-num">01</span></button>
+    <button class="nav-item" onclick="showPanel('costos',this)"><span class="icon">📊</span> Clasificación Costos <span class="nav-num">02</span></button>
+    <button class="nav-item" onclick="showPanel('cvu',this)"><span class="icon">📈</span> Precio, CVU y Utilidad <span class="nav-num">03</span></button>
+    <button class="nav-item" onclick="showPanel('pe',this)"><span class="icon">⚖️</span> Punto de Equilibrio <span class="nav-num">04</span></button>
+    <button class="nav-item" onclick="showPanel('costeo',this)"><span class="icon">🧾</span> Hoja de Costeo <span class="nav-num">05</span></button>
+    <button class="nav-item" onclick="showPanel('gantt',this)"><span class="icon">📅</span> Gráfica de Gantt <span class="nav-num">06</span></button>
+  </nav>
+  <div class="sidebar-footer">v1.0 · Datos locales en sesión</div>
+</aside>
+
+<main>
+<div class="topbar">
+  <div>
+    <div class="topbar-title" id="topbar-title">Panel de Inicio</div>
+    <div class="topbar-sub" id="topbar-sub">Visión general de tu proyecto</div>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">🔄 Limpiar todo</button>
+</div>
+
+<!-- HOME -->
+<div id="panel-home" class="panel active">
+  <div class="panel-header">
+    <div class="panel-icon">🏠</div>
+    <div>
+      <div class="module-tag">Resumen general</div>
+      <div class="panel-title">Tu proyecto de emprendimiento</div>
+      <div class="panel-desc">Ingresa los datos en cada módulo y aquí verás el resumen automático.</div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-header"><h3>📋 Datos de la empresa</h3></div>
+      <div class="card-body">
+        <div class="field"><label>Nombre del emprendedor</label><input type="text" id="h-nombre" placeholder="Tu nombre completo"></div>
+        <div class="field"><label>Nombre de la empresa</label><input type="text" id="h-empresa" placeholder="Nombre de tu negocio"></div>
+        <div class="field"><label>Producto / Servicio principal</label><input type="text" id="h-producto" placeholder="¿Qué produces o vendes?"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🎯 Indicadores clave</h3><span class="badge">LIVE</span></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="stat-card"><div class="sc-icon">🏭</div><div class="sc-val" id="s-ci">—</div><div class="sc-label">Cap. Instalada</div><div class="sc-sub">uds/mes</div></div>
+          <div class="stat-card"><div class="sc-icon">💰</div><div class="sc-val" id="s-cf">—</div><div class="sc-label">Costos Fijos</div><div class="sc-sub">$/mes</div></div>
+          <div class="stat-card"><div class="sc-icon">⚖️</div><div class="sc-val" id="s-pe">—</div><div class="sc-label">Punto Equilibrio</div><div class="sc-sub">uds/mes</div></div>
+          <div class="stat-card"><div class="sc-icon">📈</div><div class="sc-val" id="s-utilidad">—</div><div class="sc-label">Utilidad proy.</div><div class="sc-sub">$/mes</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>🗺️ Cómo usar esta herramienta</h3></div>
+    <div class="card-body">
+      <div class="grid-3">
+        <div class="alert info"><span class="alert-icon">①</span><div><strong>Módulos 01–02:</strong> Ingresa tus recursos y clasifica costos fijos y variables.</div></div>
+        <div class="alert info"><span class="alert-icon">②</span><div><strong>Módulos 03–04:</strong> Define precio de venta y calcula el Punto de Equilibrio.</div></div>
+        <div class="alert info"><span class="alert-icon">③</span><div><strong>Módulos 05–06:</strong> Elabora la hoja de costeo y planifica con la Gráfica de Gantt.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CI -->
+<div id="panel-ci" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">🏭</div>
+    <div>
+      <div class="module-tag">Módulo 01</div>
+      <div class="panel-title">Capacidad Instalada</div>
+      <div class="panel-desc">¿Cuántas unidades puedes producir al mes con los recursos disponibles?</div>
+    </div>
+  </div>
+  <div class="formula"><div class="f-label">Fórmula</div>CI = N° de recursos × Unidades/hora × Horas/día × Días/mes × (Eficiencia %)</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><h3>⚙️ Parámetros de producción</h3></div>
+      <div class="card-body">
+        <div class="field"><label>Máquinas o trabajadores <span class="hint">(recurso principal)</span></label><input type="number" id="ci-recursos" value="1" min="1" oninput="calcCI()"></div>
+        <div class="field"><label>Unidades producidas por hora</label><input type="number" id="ci-uph" value="0" min="0" step="0.5" oninput="calcCI()"></div>
+        <div class="field"><label>Horas productivas por día</label><input type="number" id="ci-hpd" value="8" min="1" max="24" oninput="calcCI()"></div>
+        <div class="field"><label>Días productivos por mes</label><input type="number" id="ci-dpm" value="25" min="1" max="31" oninput="calcCI()"></div>
+        <div class="field"><label>Eficiencia real estimada <span class="hint">(%)</span></label><input type="number" id="ci-efic" value="80" min="10" max="100" oninput="calcCI()"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3>📊 Resultados</h3><span class="badge">AUTO</span></div>
+        <div class="card-body">
+          <div class="result-row">
+            <div class="result-box"><div class="rb-label">CI teórica/día</div><div class="rb-value" id="ci-dia">0</div><div class="rb-unit">unidades</div></div>
+            <div class="result-box orange"><div class="rb-label">CI real/día</div><div class="rb-value" id="ci-dia-real">0</div><div class="rb-unit">con eficiencia</div></div>
+          </div>
+          <div class="result-row">
+            <div class="result-box blue"><div class="rb-label">CI mensual teórica</div><div class="rb-value" id="ci-mes">0</div><div class="rb-unit">uds/mes</div></div>
+            <div class="result-box success"><div class="rb-label">CI mensual real</div><div class="rb-value" id="ci-mes-real">0</div><div class="rb-unit">uds/mes</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📉 Capacidad ociosa</h3></div>
+        <div class="card-body">
+          <div class="field"><label>Producción real actual <span class="hint">(uds/mes)</span></label><input type="number" id="ci-actual" value="0" min="0" oninput="calcCI()"></div>
+          <div class="result-row">
+            <div class="result-box danger"><div class="rb-label">Capacidad ociosa</div><div class="rb-value" id="ci-ociosa">0</div><div class="rb-unit">uds sin producir</div></div>
+            <div class="result-box"><div class="rb-label">% utilización</div><div class="rb-value" id="ci-pct">0%</div><div class="rb-unit">de tu capacidad</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COSTOS -->
+<div id="panel-costos" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">📊</div>
+    <div>
+      <div class="module-tag">Módulo 02</div>
+      <div class="panel-title">Clasificación de Costos</div>
+      <div class="panel-desc">Registra y clasifica todos los costos de operación de tu empresa.</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><h3>🔒 Costos Fijos Mensuales</h3><span class="badge">CF</span></div>
+      <div class="card-body">
+        <div class="alert info"><span class="alert-icon">ℹ️</span>No cambian sin importar cuánto produzcas: renta, salarios base, seguros.</div>
+        <table class="cost-table"><thead><tr><th>Concepto</th><th>Monto mensual ($)</th><th></th></tr></thead>
+          <tbody id="cf-body"></tbody>
+          <tfoot><tr><td><strong>TOTAL CF</strong></td><td class="total-cell" id="cf-total">$0.00</td><td></td></tr></tfoot>
+        </table>
+        <button class="add-row-btn" onclick="addCFRow()">＋ Agregar concepto</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📈 Costos Variables Unitarios</h3><span class="badge">CVu</span></div>
+      <div class="card-body">
+        <div class="alert info"><span class="alert-icon">ℹ️</span>Se repiten por cada unidad que produces: materiales, empaques, mano de obra por pieza.</div>
+        <table class="cost-table"><thead><tr><th>Concepto</th><th>Costo por unidad ($)</th><th></th></tr></thead>
+          <tbody id="cv-body"></tbody>
+          <tfoot><tr><td><strong>TOTAL CVu</strong></td><td class="total-cell" id="cv-total">$0.00</td><td></td></tr></tfoot>
+        </table>
+        <button class="add-row-btn" onclick="addCVRow()">＋ Agregar concepto</button>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:20px">
+    <div class="grid-3">
+      <div class="result-box blue" style="padding:18px;border-radius:12px">
+        <div class="rb-label">Costos Fijos Totales</div><div class="rb-value" id="r-cf">$0.00</div><div class="rb-unit">por mes</div>
+      </div>
+      <div class="result-box orange" style="padding:18px;border-radius:12px">
+        <div class="rb-label">Costo Variable Unitario</div><div class="rb-value" id="r-cvu">$0.00</div><div class="rb-unit">por unidad</div>
+      </div>
+      <div class="result-box" style="padding:18px;border-radius:12px">
+        <div class="rb-label">Costo Total (100 uds ejemplo)</div><div class="rb-value" id="r-ct100">$0.00</div><div class="rb-unit">CF + CVu×100</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CVU -->
+<div id="panel-cvu" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">📈</div>
+    <div>
+      <div class="module-tag">Módulo 03</div>
+      <div class="panel-title">Precio, Costo-Volumen-Utilidad</div>
+      <div class="panel-desc">Analiza la relación entre precio, costos y volumen para maximizar tu utilidad.</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3>💲 Parámetros CVU</h3></div>
+        <div class="card-body">
+          <div class="alert info" style="margin-bottom:12px"><span class="alert-icon">🔄</span>Los valores de costos se sincronizan automáticamente desde el Módulo 02.</div>
+          <div class="field"><label>Precio de Venta Unitario <span class="hint">(PVu) $</span></label><input type="number" id="cvu-pvu" value="0" min="0" step="0.01" oninput="calcCVU()"></div>
+          <div class="field"><label>Costo Variable Unitario <span class="hint">(CVu) $</span></label><input type="number" id="cvu-cvu" value="0" min="0" step="0.01" oninput="calcCVU()"></div>
+          <div class="field"><label>Costos Fijos Mensuales <span class="hint">(CF) $</span></label><input type="number" id="cvu-cf" value="0" min="0" step="0.01" oninput="calcCVU()"></div>
+          <div class="field"><label>Unidades proyectadas a vender <span class="hint">(Q)</span></label><input type="number" id="cvu-q" value="100" min="1" oninput="calcCVU()"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🧮 Resultados CVU</h3></div>
+        <div class="card-body">
+          <div class="formula"><div class="f-label">Margen de Contribución</div>MCu = PVu − CVu</div>
+          <div class="result-row">
+            <div class="result-box orange"><div class="rb-label">MCu (por unidad)</div><div class="rb-value" id="cvu-mcu">$0</div><div class="rb-unit">margen contribución</div></div>
+            <div class="result-box blue"><div class="rb-label">MCu total</div><div class="rb-value" id="cvu-mct">$0</div><div class="rb-unit">MCu × Q</div></div>
+          </div>
+          <div class="formula" style="margin-top:14px"><div class="f-label">Utilidad proyectada</div>U = (MCu × Q) − CF = IT − CT</div>
+          <div class="result-row">
+            <div class="result-box blue"><div class="rb-label">Ingresos Totales</div><div class="rb-value" id="cvu-it">$0</div><div class="rb-unit">PVu × Q</div></div>
+            <div class="result-box"><div class="rb-label">Costo Total</div><div class="rb-value" id="cvu-ct">$0</div><div class="rb-unit">CF + CVu×Q</div></div>
+          </div>
+          <div class="result-row">
+            <div class="result-box success" id="cvu-utilidad-box"><div class="rb-label">UTILIDAD NETA</div><div class="rb-value" id="cvu-util">$0</div><div class="rb-unit">proyectada</div></div>
+            <div class="result-box orange"><div class="rb-label">Razón MCu (RMC)</div><div class="rb-value" id="cvu-rmc">0%</div><div class="rb-unit">MCu ÷ PVu</div></div>
+          </div>
+          <div id="cvu-alert" class="alert info" style="margin-top:12px"><span class="alert-icon">💡</span><span id="cvu-alert-text">Ingresa los datos para ver el análisis.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📊 Gráfica CVU</h3></div>
+      <div class="card-body">
+        <svg id="cvu-svg" width="100%" viewBox="0 0 500 320" style="overflow:visible">
+          <defs>
+            <marker id="ax1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#8A9AB5"/></marker>
+            <marker id="ay1" markerWidth="8" markerHeight="8" refX="4" refY="6" orient="auto"><path d="M0,8 L8,8 L4,0 Z" fill="#8A9AB5"/></marker>
+          </defs>
+          <line x1="60" y1="280" x2="490" y2="280" stroke="#8A9AB5" stroke-width="1.5" marker-end="url(#ax1)"/>
+          <line x1="60" y1="280" x2="60" y2="20" stroke="#8A9AB5" stroke-width="1.5" marker-end="url(#ay1)"/>
+          <text x="270" y="308" font-family="DM Mono,monospace" font-size="11" fill="#8A9AB5" text-anchor="middle">Unidades (Q)</text>
+          <text x="14" y="160" font-family="DM Mono,monospace" font-size="11" fill="#8A9AB5" text-anchor="middle" transform="rotate(-90,14,160)">$ Pesos</text>
+          <g id="cvu-lines"></g>
+          <rect x="285" y="24" width="200" height="72" rx="6" fill="white" stroke="#D0DFF0"/>
+          <line x1="296" y1="40" x2="318" y2="40" stroke="#2E75B6" stroke-width="2.5"/>
+          <text x="323" y="44" font-family="DM Mono,monospace" font-size="10" fill="#4A5568">Ingresos Totales</text>
+          <line x1="296" y1="57" x2="318" y2="57" stroke="#E8943A" stroke-width="2.5" stroke-dasharray="5,3"/>
+          <text x="323" y="61" font-family="DM Mono,monospace" font-size="10" fill="#4A5568">Costos Totales</text>
+          <line x1="296" y1="74" x2="318" y2="74" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="323" y="78" font-family="DM Mono,monospace" font-size="10" fill="#4A5568">Costos Fijos</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PE -->
+<div id="panel-pe" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">⚖️</div>
+    <div>
+      <div class="module-tag">Módulo 04</div>
+      <div class="panel-title">Punto de Equilibrio</div>
+      <div class="panel-desc">El mínimo de ventas para no perder dinero. Cada venta adicional genera utilidad.</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><h3>📥 Datos de entrada</h3></div>
+      <div class="card-body">
+        <div class="field"><label>Costos Fijos Mensuales <span class="hint">(CF) $</span></label><input type="number" id="pe-cf" value="0" min="0" step="0.01" oninput="calcPE()"></div>
+        <div class="field"><label>Precio de Venta Unitario <span class="hint">(PVu) $</span></label><input type="number" id="pe-pvu" value="0" min="0" step="0.01" oninput="calcPE()"></div>
+        <div class="field"><label>Costo Variable Unitario <span class="hint">(CVu) $</span></label><input type="number" id="pe-cvu" value="0" min="0" step="0.01" oninput="calcPE()"></div>
+        <button class="calc-btn orange" onclick="syncFromCVU()">🔄 Sincronizar desde Módulo 03</button>
+        <div class="divider"></div>
+        <div class="formula"><div class="f-label">PE en unidades</div>PE = CF ÷ (PVu − CVu)</div>
+        <div class="formula"><div class="f-label">PE en pesos</div>PE ($) = PE (uds) × PVu</div>
+        <div class="formula"><div class="f-label">Razón de Margen de Contribución</div>RMC = (PVu − CVu) ÷ PVu × 100</div>
+      </div>
+    </div>
+    <div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="result-box orange" style="padding:20px;border-radius:12px;text-align:center">
+          <div class="rb-label">PE en unidades</div>
+          <div class="rb-value" id="pe-uds" style="font-size:32px">—</div>
+          <div class="rb-unit">unidades/mes mínimo</div>
+        </div>
+        <div class="result-box blue" style="padding:20px;border-radius:12px;text-align:center">
+          <div class="rb-label">PE en pesos</div>
+          <div class="rb-value" id="pe-pesos" style="font-size:26px">—</div>
+          <div class="rb-unit">$ ventas mínimas/mes</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="result-box" style="padding:16px;border-radius:12px;text-align:center">
+          <div class="rb-label">Margen contribución unit.</div>
+          <div class="rb-value" id="pe-mcu">$0</div><div class="rb-unit">por unidad vendida</div>
+        </div>
+        <div class="result-box success" style="padding:16px;border-radius:12px;text-align:center">
+          <div class="rb-label">RMC</div>
+          <div class="rb-value" id="pe-rmc">0%</div><div class="rb-unit">razón de margen</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <h4>📉 Gráfica del Punto de Equilibrio</h4>
+        <svg id="pe-svg" width="100%" viewBox="0 0 500 220" style="overflow:visible">
+          <defs>
+            <marker id="ax2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#8A9AB5"/></marker>
+            <marker id="ay2" markerWidth="8" markerHeight="8" refX="4" refY="6" orient="auto"><path d="M0,8 L8,8 L4,0 Z" fill="#8A9AB5"/></marker>
+          </defs>
+          <line x1="50" y1="195" x2="490" y2="195" stroke="#8A9AB5" stroke-width="1.5" marker-end="url(#ax2)"/>
+          <line x1="50" y1="195" x2="50" y2="10" stroke="#8A9AB5" stroke-width="1.5" marker-end="url(#ay2)"/>
+          <text x="270" y="215" font-family="DM Mono,monospace" font-size="10" fill="#8A9AB5" text-anchor="middle">Unidades (Q)</text>
+          <g id="pe-lines"></g>
+        </svg>
+      </div>
+      <div id="pe-alert" class="alert info" style="margin-top:12px"><span class="alert-icon">💡</span><span id="pe-alert-text">Ingresa los datos para calcular el Punto de Equilibrio.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- COSTEO -->
+<div id="panel-costeo" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">🧾</div>
+    <div>
+      <div class="module-tag">Módulo 05</div>
+      <div class="panel-title">Hoja de Costeo Unitario</div>
+      <div class="panel-desc">Calcula el costo real de producir una unidad de tu producto o servicio principal.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><h3>🔵 A. Materia Prima Directa (MPD)</h3><span class="badge">MPD</span></div>
+    <div class="card-body">
+      <table class="cost-table"><thead><tr><th>Insumo / Material</th><th>Unidad</th><th>Cantidad</th><th>Costo unit. ($)</th><th>Subtotal ($)</th><th></th></tr></thead>
+        <tbody id="mpd-body"></tbody>
+        <tfoot><tr><td colspan="4">SUBTOTAL MPD</td><td class="total-cell" id="mpd-total">$0.00</td><td></td></tr></tfoot>
+      </table>
+      <button class="add-row-btn" onclick="addMPDRow()">＋ Agregar insumo</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><h3>🟢 B. Mano de Obra Directa (MOD)</h3><span class="badge">MOD</span></div>
+    <div class="card-body">
+      <table class="cost-table"><thead><tr><th>Actividad</th><th>Responsable</th><th>Tiempo (hrs)</th><th>Tarifa ($/hr)</th><th>Subtotal ($)</th><th></th></tr></thead>
+        <tbody id="mod-body"></tbody>
+        <tfoot><tr><td colspan="4">SUBTOTAL MOD</td><td class="total-cell" id="mod-total">$0.00</td><td></td></tr></tfoot>
+      </table>
+      <button class="add-row-btn" onclick="addMODRow()">＋ Agregar operación</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-header"><h3>🟡 C. Gastos Indirectos de Fabricación (GIF)</h3><span class="badge">GIF</span></div>
+    <div class="card-body">
+      <table class="cost-table"><thead><tr><th>Concepto</th><th>Base de cálculo</th><th>Costo por unidad ($)</th><th></th></tr></thead>
+        <tbody id="gif-body"></tbody>
+        <tfoot><tr><td colspan="2">SUBTOTAL GIF</td><td class="total-cell" id="gif-total">$0.00</td><td></td></tr></tfoot>
+      </table>
+      <button class="add-row-btn" onclick="addGIFRow()">＋ Agregar gasto indirecto</button>
+    </div>
+  </div>
+
+  <div class="summary-section">
+    <h3>Resumen del Costo Unitario</h3>
+    <div class="summary-row"><span class="sr-label">Subtotal MPD</span><span class="sr-val" id="rs-mpd">$0.00</span></div>
+    <div class="summary-row"><span class="sr-label">Subtotal MOD</span><span class="sr-val" id="rs-mod">$0.00</span></div>
+    <div class="summary-row"><span class="sr-label">Subtotal GIF</span><span class="sr-val" id="rs-gif">$0.00</span></div>
+    <div class="summary-row"><span class="sr-label">Costo de Producción Unitario</span><span class="sr-val orange" id="rs-cpu">$0.00</span></div>
+    <div class="summary-row">
+      <span class="sr-label">Gastos Adm. y Ventas <input type="number" id="pct-adm" value="10" min="0" max="100" style="width:48px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:4px;color:#fff;font-family:var(--font-mono);font-size:12px;padding:2px 5px;text-align:center" oninput="calcCosteo()"> %</span>
+      <span class="sr-val" id="rs-adm">$0.00</span>
+    </div>
+    <div class="summary-row"><span class="sr-label" style="font-weight:700;color:#fff">COSTO TOTAL UNITARIO</span><span class="sr-val orange" id="rs-ctu" style="font-size:18px">$0.00</span></div>
+    <div class="divider" style="border-color:rgba(255,255,255,.1);margin:8px 0"></div>
+    <div class="summary-row">
+      <span class="sr-label">Margen de utilidad deseado <input type="number" id="pct-util" value="30" min="0" max="500" style="width:48px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:4px;color:#fff;font-family:var(--font-mono);font-size:12px;padding:2px 5px;text-align:center" oninput="calcCosteo()"> %</span>
+      <span class="sr-val" id="rs-margen">$0.00</span>
+    </div>
+    <div class="summary-row"><span class="sr-label" style="font-size:16px;color:#fff;font-weight:700">💲 PRECIO DE VENTA SUGERIDO</span><span class="sr-val orange" id="rs-pv" style="font-size:24px">$0.00</span></div>
+  </div>
+
+  <div class="chart-wrap">
+    <h4>Composición del costo por categoría</h4>
+    <div class="bar-chart">
+      <div class="bar-row"><span class="bar-label">MPD</span><div class="bar-track"><div class="bar-fill" id="bar-mpd" style="width:0%;background:var(--blue)"><span></span></div></div></div>
+      <div class="bar-row"><span class="bar-label">MOD</span><div class="bar-track"><div class="bar-fill" id="bar-mod" style="width:0%;background:var(--orange)"><span></span></div></div></div>
+      <div class="bar-row"><span class="bar-label">GIF</span><div class="bar-track"><div class="bar-fill" id="bar-gif" style="width:0%;background:var(--navy)"><span></span></div></div></div>
+      <div class="bar-row"><span class="bar-label">Adm. & Ventas</span><div class="bar-track"><div class="bar-fill" id="bar-adm" style="width:0%;background:#7FB3D3"><span></span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- GANTT -->
+<div id="panel-gantt" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">📅</div>
+    <div>
+      <div class="module-tag">Módulo 06</div>
+      <div class="panel-title">Gráfica de Gantt</div>
+      <div class="panel-desc">Planifica las actividades de tu ciclo productivo y visualiza los tiempos de cada etapa.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><h3>⚙️ Configuración</h3></div>
+    <div class="card-body">
+      <div class="grid-3">
+        <div class="field"><label>Unidad de tiempo</label>
+          <select id="gantt-unit" onchange="renderGantt()">
+            <option value="Horas">Horas</option>
+            <option value="Días" selected>Días</option>
+            <option value="Semanas">Semanas</option>
+            <option value="Meses">Meses</option>
+          </select>
+        </div>
+        <div class="field"><label>Número de períodos</label><input type="number" id="gantt-periods" value="8" min="4" max="20" oninput="renderGantt()"></div>
+        <div class="field" style="display:flex;align-items:flex-end">
+          <button class="calc-btn" style="margin-top:0" onclick="addGanttRow()">＋ Agregar actividad</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>📊 Diagrama de Gantt</h3><span class="badge">Clic en celdas para marcar</span></div>
+    <div class="card-body">
+      <div class="alert info" style="margin-bottom:14px"><span class="alert-icon">💡</span>Haz clic en las celdas azules para marcar o desmarcar cada actividad. Edita el nombre haciendo clic en él.</div>
+      <div class="gantt-wrapper"><table class="gantt-table" id="gantt-table"></table></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-header"><h3>📋 Resumen de duración por actividad</h3></div>
+    <div class="card-body" id="gantt-summary"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const state = { cf:[], cv:[], mpd:[], mod:[], gif:[], ganttRows:[], ganttData:{} };
+
+const titles = {
+  home:   ['Panel de Inicio','Visión general de tu proyecto'],
+  ci:     ['Módulo 01 · Capacidad Instalada','¿Cuánto puedo producir?'],
+  costos: ['Módulo 02 · Clasificación de Costos','Costos Fijos vs. Variables'],
+  cvu:    ['Módulo 03 · CVU y Utilidad','Precio, Costo, Volumen y Utilidad'],
+  pe:     ['Módulo 04 · Punto de Equilibrio','El umbral mínimo de ventas'],
+  costeo: ['Módulo 05 · Hoja de Costeo','Costo real por unidad producida'],
+  gantt:  ['Módulo 06 · Gráfica de Gantt','Planificación del proceso productivo'],
+};
+
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[id][0];
+  document.getElementById('topbar-sub').textContent = titles[id][1];
+  if (id==='cvu') syncCVUFromCostos();
+  if (id==='pe')  syncFromCVU();
+  if (id==='gantt') renderGantt();
+}
+
+function resetAll() {
+  if (!confirm('¿Limpiar todos los datos?')) return;
+  ['cf','cv','mpd','mod','gif'].forEach(k=>state[k]=[]);
+  state.ganttRows=[]; state.ganttData={};
+  renderAllTables(); calcCI(); calcCVU(); calcPE(); calcCosteo(); renderGantt();
+  ['h-nombre','h-empresa','h-producto'].forEach(id=>document.getElementById(id).value='');
+}
+
+function fmt(n,dec=0) { return isNaN(n)?'0':Number(n).toLocaleString('es-MX',{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+function fmtM(n) { return '$'+fmt(n,2); }
+
+function updateSummary() {
+  const ciMes = parseFloat(document.getElementById('ci-mes-real').textContent)||0;
+  const cf = getTotalCF();
+  const peEl = document.getElementById('pe-uds').textContent;
+  const util = parseFloat((document.getElementById('cvu-util').textContent||'').replace(/[$,]/g,''))||0;
+  document.getElementById('s-ci').textContent = ciMes ? fmt(ciMes) : '—';
+  document.getElementById('s-cf').textContent = cf ? '$'+fmt(cf) : '—';
+  document.getElementById('s-pe').textContent = (peEl==='—'||peEl==='∞') ? peEl : fmt(parseFloat(peEl)||0,1);
+  document.getElementById('s-utilidad').textContent = util ? '$'+fmt(util) : '—';
+}
+
+// ── CI ──────────────────────────────────────────────────────────
+function calcCI() {
+  const r=parseFloat(document.getElementById('ci-recursos').value)||0;
+  const uph=parseFloat(document.getElementById('ci-uph').value)||0;
+  const hpd=parseFloat(document.getElementById('ci-hpd').value)||8;
+  const dpm=parseFloat(document.getElementById('ci-dpm').value)||25;
+  const ef=(parseFloat(document.getElementById('ci-efic').value)||80)/100;
+  const actual=parseFloat(document.getElementById('ci-actual').value)||0;
+  const ciDia=r*uph*hpd, ciDiaR=ciDia*ef, ciMes=ciDia*dpm, ciMesR=ciDiaR*dpm;
+  const ociosa=Math.max(0,ciMesR-actual), pct=ciMesR>0?actual/ciMesR*100:0;
+  document.getElementById('ci-dia').textContent=fmt(ciDia,1);
+  document.getElementById('ci-dia-real').textContent=fmt(ciDiaR,1);
+  document.getElementById('ci-mes').textContent=fmt(ciMes,0);
+  document.getElementById('ci-mes-real').textContent=fmt(ciMesR,0);
+  document.getElementById('ci-ociosa').textContent=fmt(ociosa,0);
+  document.getElementById('ci-pct').textContent=fmt(pct,1)+'%';
+  updateSummary();
+}
+
+// ── COSTOS ──────────────────────────────────────────────────────
+function getTotalCF(){return state.cf.reduce((s,r)=>s+(parseFloat(r.monto)||0),0);}
+function getTotalCV(){return state.cv.reduce((s,r)=>s+(parseFloat(r.monto)||0),0);}
+
+function renderCFTable(){
+  const body=document.getElementById('cf-body'); body.innerHTML='';
+  state.cf.forEach((row,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${row.concepto}" placeholder="Ej: Renta" oninput="state.cf[${i}].concepto=this.value"></td>
+    <td><input type="number" value="${row.monto}" placeholder="0.00" min="0" step="0.01" oninput="state.cf[${i}].monto=this.value;updateCFTotals()"></td>
+    <td><button class="delete-row" onclick="state.cf.splice(${i},1);renderCFTable()">✕</button></td>`;
+    body.appendChild(tr);
+  }); updateCFTotals();
+}
+function updateCFTotals(){
+  const t=getTotalCF(),cv=getTotalCV();
+  document.getElementById('cf-total').textContent=fmtM(t);
+  document.getElementById('r-cf').textContent=fmtM(t);
+  document.getElementById('r-ct100').textContent=fmtM(t+cv*100);
+  updateSummary();
+}
+function addCFRow(){state.cf.push({concepto:'',monto:0});renderCFTable();}
+
+function renderCVTable(){
+  const body=document.getElementById('cv-body'); body.innerHTML='';
+  state.cv.forEach((row,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${row.concepto}" placeholder="Ej: Materia prima" oninput="state.cv[${i}].concepto=this.value"></td>
+    <td><input type="number" value="${row.monto}" placeholder="0.00" min="0" step="0.01" oninput="state.cv[${i}].monto=this.value;updateCVTotals()"></td>
+    <td><button class="delete-row" onclick="state.cv.splice(${i},1);renderCVTable()">✕</button></td>`;
+    body.appendChild(tr);
+  }); updateCVTotals();
+}
+function updateCVTotals(){
+  const t=getTotalCV(),cf=getTotalCF();
+  document.getElementById('cv-total').textContent=fmtM(t);
+  document.getElementById('r-cvu').textContent=fmtM(t);
+  document.getElementById('r-ct100').textContent=fmtM(cf+t*100);
+}
+function addCVRow(){state.cv.push({concepto:'',monto:0});renderCVTable();}
+
+function renderAllTables(){renderCFTable();renderCVTable();renderMPDTable();renderMODTable();renderGIFTable();}
+
+// ── CVU ──────────────────────────────────────────────────────────
+function syncCVUFromCostos(){
+  const cf=getTotalCF(),cvu=getTotalCV();
+  if(cf) document.getElementById('cvu-cf').value=cf.toFixed(2);
+  if(cvu) document.getElementById('cvu-cvu').value=cvu.toFixed(2);
+  calcCVU();
+}
+function calcCVU(){
+  const pvu=parseFloat(document.getElementById('cvu-pvu').value)||0;
+  const cvu=parseFloat(document.getElementById('cvu-cvu').value)||0;
+  const cf=parseFloat(document.getElementById('cvu-cf').value)||0;
+  const q=parseFloat(document.getElementById('cvu-q').value)||0;
+  const mcu=pvu-cvu,it=pvu*q,ct=cf+cvu*q,util=it-ct,rmc=pvu>0?mcu/pvu*100:0;
+  document.getElementById('cvu-mcu').textContent=fmtM(mcu);
+  document.getElementById('cvu-mct').textContent=fmtM(mcu*q);
+  document.getElementById('cvu-it').textContent=fmtM(it);
+  document.getElementById('cvu-ct').textContent=fmtM(ct);
+  document.getElementById('cvu-util').textContent=fmtM(util);
+  document.getElementById('cvu-rmc').textContent=fmt(rmc,1)+'%';
+  const box=document.getElementById('cvu-utilidad-box');
+  const al=document.getElementById('cvu-alert'), at=document.getElementById('cvu-alert-text');
+  if(util>0){box.className='result-box success';al.className='alert good';at.textContent=`✅ Con ${fmt(q)} unidades generas ${fmtM(util)} de utilidad. Cada unidad adicional aporta ${fmtM(mcu)}.`;}
+  else if(util<0){box.className='result-box danger';al.className='alert bad';at.textContent=`⚠️ Con ${fmt(q)} unidades tienes una pérdida de ${fmtM(Math.abs(util))}. Ajusta precio o reduce costos.`;}
+  else{box.className='result-box';al.className='alert warn';at.textContent=`Exactamente en equilibrio con ${fmt(q)} unidades.`;}
+  drawCVUChart(pvu,cvu,cf,q);
+  updateSummary();
+}
+
+function drawCVUChart(pvu,cvu,cf,qMax){
+  const g=document.getElementById('cvu-lines'); g.innerHTML='';
+  const W=430,H=260,ox=60,oy=280,maxQ=Math.max(qMax*1.3,20);
+  const maxY=Math.max(pvu*maxQ,cf+cvu*maxQ)*1.1||1000;
+  const toX=q=>ox+(q/maxQ)*W, toY=v=>oy-(v/maxY)*H;
+  const pe=(pvu>cvu&&cf>0)?cf/(pvu-cvu):0;
+  if(pe>0&&pe<maxQ){
+    const pg=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    pg.setAttribute('points',`${toX(pe)},${toY(pvu*pe)} ${toX(maxQ)},${toY(pvu*maxQ)} ${toX(maxQ)},${toY(cf+cvu*maxQ)}`);
+    pg.setAttribute('fill','rgba(39,174,96,.10)'); g.appendChild(pg);
+    const vl=document.createElementNS('http://www.w3.org/2000/svg','line');
+    vl.setAttribute('x1',toX(pe));vl.setAttribute('y1',oy);vl.setAttribute('x2',toX(pe));vl.setAttribute('y2',toY(pvu*pe));
+    vl.setAttribute('stroke','#E8943A');vl.setAttribute('stroke-width','1.5');vl.setAttribute('stroke-dasharray','4,3'); g.appendChild(vl);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',toX(pe)+4);t.setAttribute('y',oy-5);t.setAttribute('font-family','DM Mono,monospace');t.setAttribute('font-size','9');t.setAttribute('fill','#E8943A');t.textContent='PE='+fmt(pe,0); g.appendChild(t);
+  }
+  const lines=[
+    {x1:ox,y1:toY(cf),x2:toX(maxQ),y2:toY(cf),stroke:'#888',sw:'1.5',dash:'4,3'},
+    {x1:ox,y1:toY(cf),x2:toX(maxQ),y2:toY(cf+cvu*maxQ),stroke:'#E8943A',sw:'2.5',dash:'5,3'},
+    {x1:ox,y1:toY(0),x2:toX(maxQ),y2:toY(pvu*maxQ),stroke:'#2E75B6',sw:'2.5',dash:''},
+  ];
+  lines.forEach(l=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','line');
+    Object.entries({x1:l.x1,y1:l.y1,x2:l.x2,y2:l.y2,stroke:l.stroke,'stroke-width':l.sw}).forEach(([k,v])=>el.setAttribute(k,v));
+    if(l.dash) el.setAttribute('stroke-dasharray',l.dash); g.appendChild(el);
+  });
+  [0,.25,.5,.75,1].forEach(f=>{
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x','55');t.setAttribute('y',toY(maxY*f)+3);t.setAttribute('font-family','DM Mono,monospace');t.setAttribute('font-size','8');t.setAttribute('fill','#8A9AB5');t.setAttribute('text-anchor','end');
+    t.textContent='$'+fmt(maxY*f,0); g.appendChild(t);
+  });
+}
+
+// ── PE ──────────────────────────────────────────────────────────
+function syncFromCVU(){
+  const cf=parseFloat(document.getElementById('cvu-cf').value)||0;
+  const pvu=parseFloat(document.getElementById('cvu-pvu').value)||0;
+  const cvu=parseFloat(document.getElementById('cvu-cvu').value)||0;
+  document.getElementById('pe-cf').value=cf;
+  document.getElementById('pe-pvu').value=pvu;
+  document.getElementById('pe-cvu').value=cvu;
+  calcPE();
+}
+function calcPE(){
+  const cf=parseFloat(document.getElementById('pe-cf').value)||0;
+  const pvu=parseFloat(document.getElementById('pe-pvu').value)||0;
+  const cvu=parseFloat(document.getElementById('pe-cvu').value)||0;
+  const mcu=pvu-cvu,rmc=pvu>0?mcu/pvu*100:0;
+  document.getElementById('pe-mcu').textContent=fmtM(mcu);
+  document.getElementById('pe-rmc').textContent=fmt(rmc,1)+'%';
+  const al=document.getElementById('pe-alert'),at=document.getElementById('pe-alert-text');
+  if(mcu<=0){
+    document.getElementById('pe-uds').textContent='∞';
+    document.getElementById('pe-pesos').textContent='—';
+    al.className='alert bad';at.textContent='⚠️ El precio debe ser mayor al costo variable. Ajusta tu precio.';
+    drawPEChart(0,0,pvu,cvu,cf); return;
+  }
+  const pe=cf/mcu,pePesos=pe*pvu;
+  document.getElementById('pe-uds').textContent=fmt(pe,1);
+  document.getElementById('pe-pesos').textContent=fmtM(pePesos);
+  al.className='alert good';
+  at.textContent=`✅ Necesitas vender ${fmt(pe,1)} uds/mes (${fmtM(pePesos)}) para cubrir todos tus costos. A partir de la unidad ${Math.ceil(pe)+1}, cada venta genera ${fmtM(mcu)} de utilidad neta.`;
+  drawPEChart(pe,pePesos,pvu,cvu,cf); updateSummary();
+}
+
+function drawPEChart(pe,peP,pvu,cvu,cf){
+  const g=document.getElementById('pe-lines'); g.innerHTML='';
+  const W=430,H=175,ox=50,oy=195,maxQ=Math.max(pe*2,30);
+  const maxY=Math.max(pvu*maxQ,cf+cvu*maxQ)*1.1||1000;
+  const toX=q=>ox+(q/maxQ)*W,toY=v=>oy-(v/maxY)*H;
+  if(pe>0){
+    const pg=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    pg.setAttribute('points',`${toX(pe)},${toY(pvu*pe)} ${toX(maxQ)},${toY(pvu*maxQ)} ${toX(maxQ)},${toY(cf+cvu*maxQ)}`);
+    pg.setAttribute('fill','rgba(39,174,96,.12)'); g.appendChild(pg);
+    const pb=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    pb.setAttribute('points',`${toX(0)},${toY(0)} ${toX(pe)},${toY(pvu*pe)} ${toX(pe)},${toY(cf)} ${toX(0)},${toY(cf)}`);
+    pb.setAttribute('fill','rgba(231,76,60,.08)'); g.appendChild(pb);
+  }
+  [[ox,toY(cf),toX(maxQ),toY(cf),'#888','1.5','4,3'],
+   [ox,toY(cf),toX(maxQ),toY(cf+cvu*maxQ),'#E8943A','2.5','5,3'],
+   [ox,toY(0),toX(maxQ),toY(pvu*maxQ),'#2E75B6','2.5','']].forEach(([x1,y1,x2,y2,col,sw,dash])=>{
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke',col);l.setAttribute('stroke-width',sw);
+    if(dash)l.setAttribute('stroke-dasharray',dash); g.appendChild(l);
+  });
+  if(pe>0){
+    const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',toX(pe));dot.setAttribute('cy',toY(pvu*pe));
+    dot.setAttribute('r','6');dot.setAttribute('fill','#E8943A');dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','2'); g.appendChild(dot);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',toX(pe)+8);t.setAttribute('y',toY(pvu*pe)-6);
+    t.setAttribute('font-family','DM Mono,monospace');t.setAttribute('font-size','9');t.setAttribute('fill','#E8943A');t.textContent='PE'; g.appendChild(t);
+  }
+}
+
+// ── COSTEO ──────────────────────────────────────────────────────
+function renderMPDTable(){
+  const body=document.getElementById('mpd-body'); body.innerHTML='';
+  state.mpd.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${r.nombre}" placeholder="Material..." oninput="state.mpd[${i}].nombre=this.value"></td>
+    <td><input type="text" value="${r.unidad}" placeholder="kg/ml/pza" oninput="state.mpd[${i}].unidad=this.value"></td>
+    <td><input type="number" value="${r.qty}" min="0" step="0.01" oninput="state.mpd[${i}].qty=parseFloat(this.value)||0;calcCosteo()"></td>
+    <td><input type="number" value="${r.costo}" min="0" step="0.01" oninput="state.mpd[${i}].costo=parseFloat(this.value)||0;calcCosteo()"></td>
+    <td class="total-cell">${fmtM(r.qty*r.costo)}</td>
+    <td><button class="delete-row" onclick="state.mpd.splice(${i},1);renderMPDTable();calcCosteo()">✕</button></td>`;
+    body.appendChild(tr);
+  }); calcCosteo();
+}
+function addMPDRow(){state.mpd.push({nombre:'',unidad:'',qty:0,costo:0});renderMPDTable();}
+
+function renderMODTable(){
+  const body=document.getElementById('mod-body'); body.innerHTML='';
+  state.mod.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${r.nombre}" placeholder="Actividad..." oninput="state.mod[${i}].nombre=this.value"></td>
+    <td><input type="text" value="${r.resp}" placeholder="Responsable" oninput="state.mod[${i}].resp=this.value"></td>
+    <td><input type="number" value="${r.tiempo}" min="0" step="0.01" oninput="state.mod[${i}].tiempo=parseFloat(this.value)||0;calcCosteo()"></td>
+    <td><input type="number" value="${r.tarifa}" min="0" step="0.01" oninput="state.mod[${i}].tarifa=parseFloat(this.value)||0;calcCosteo()"></td>
+    <td class="total-cell">${fmtM(r.tiempo*r.tarifa)}</td>
+    <td><button class="delete-row" onclick="state.mod.splice(${i},1);renderMODTable();calcCosteo()">✕</button></td>`;
+    body.appendChild(tr);
+  }); calcCosteo();
+}
+function addMODRow(){state.mod.push({nombre:'',resp:'',tiempo:0,tarifa:0});renderMODTable();}
+
+function renderGIFTable(){
+  const body=document.getElementById('gif-body'); body.innerHTML='';
+  state.gif.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${r.nombre}" placeholder="Concepto GIF..." oninput="state.gif[${i}].nombre=this.value"></td>
+    <td><input type="text" value="${r.base}" placeholder="Ej: 0.25 hrs × $4/hr" oninput="state.gif[${i}].base=this.value"></td>
+    <td><input type="number" value="${r.costo}" min="0" step="0.01" oninput="state.gif[${i}].costo=parseFloat(this.value)||0;calcCosteo()"></td>
+    <td><button class="delete-row" onclick="state.gif.splice(${i},1);renderGIFTable();calcCosteo()">✕</button></td>`;
+    body.appendChild(tr);
+  }); calcCosteo();
+}
+function addGIFRow(){state.gif.push({nombre:'',base:'',costo:0});renderGIFTable();}
+
+function calcCosteo(){
+  const mpd=state.mpd.reduce((s,r)=>s+r.qty*r.costo,0);
+  const mod=state.mod.reduce((s,r)=>s+r.tiempo*r.tarifa,0);
+  const gif=state.gif.reduce((s,r)=>s+r.costo,0);
+  const cpu=mpd+mod+gif;
+  const pctAdm=(parseFloat(document.getElementById('pct-adm').value)||0)/100;
+  const pctUtil=(parseFloat(document.getElementById('pct-util').value)||0)/100;
+  const adm=cpu*pctAdm,ctu=cpu+adm,margen=ctu*pctUtil,pv=ctu+margen;
+  ['mpd-total','mod-total','gif-total'].forEach((id,k)=>document.getElementById(id).textContent=fmtM([mpd,mod,gif][k]));
+  ['rs-mpd','rs-mod','rs-gif','rs-cpu','rs-adm','rs-ctu','rs-margen','rs-pv'].forEach((id,k)=>
+    document.getElementById(id).textContent=fmtM([mpd,mod,gif,cpu,adm,ctu,margen,pv][k]));
+  document.querySelectorAll('#mpd-body tr').forEach((tr,i)=>{const r=state.mpd[i];if(r)tr.querySelector('.total-cell').textContent=fmtM(r.qty*r.costo);});
+  document.querySelectorAll('#mod-body tr').forEach((tr,i)=>{const r=state.mod[i];if(r)tr.querySelector('.total-cell').textContent=fmtM(r.tiempo*r.tarifa);});
+  const total=Math.max(ctu,0.01);
+  [['bar-mpd',mpd],['bar-mod',mod],['bar-gif',gif],['bar-adm',adm]].forEach(([id,val])=>{
+    const el=document.getElementById(id),pct=Math.min(100,val/total*100);
+    el.style.width=pct+'%'; el.querySelector('span').textContent=pct>5?fmt(pct,0)+'%':'';
+  });
+}
+
+// ── GANTT ──────────────────────────────────────────────────────
+function initGantt(){
+  state.ganttRows=['Diseño del producto','Compra de materiales','Producción','Control de calidad','Empaque y entrega'];
+  state.ganttData={};
+  [[0,1],[0],[1,1,1],[0,0,1],[0,0,0,1]].forEach((row,ri)=>row.forEach((v,ci)=>{if(v)state.ganttData[`${ri}-${ci}`]=true;}));
+}
+
+function renderGantt(){
+  const periods=Math.max(4,Math.min(20,parseInt(document.getElementById('gantt-periods').value)||8));
+  const unit=document.getElementById('gantt-unit').value;
+  const table=document.getElementById('gantt-table'); table.innerHTML='';
+  const thead=document.createElement('thead');
+  let thRow=`<tr><th style="min-width:150px;text-align:left;padding-left:10px">Actividad</th>`;
+  for(let i=0;i<periods;i++) thRow+=`<th>${unit.charAt(0)}${i+1}</th>`;
+  thRow+=`<th>Dur.</th></tr>`;
+  thead.innerHTML=thRow; table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+  state.ganttRows.forEach((act,ri)=>{
+    const tr=document.createElement('tr'); let dur=0;
+    let cells=`<td><input class="gantt-input" value="${act}" onchange="state.ganttRows[${ri}]=this.value;updateGanttSummary()"></td>`;
+    for(let ci=0;ci<periods;ci++){
+      const key=`${ri}-${ci}`,active=!!state.ganttData[key];
+      if(active) dur++;
+      cells+=`<td><button class="gantt-cell ${active?'active':''}" onclick="toggleGantt(${ri},${ci},this)"></button></td>`;
+    }
+    cells+=`<td style="font-family:var(--font-mono);font-size:11px;color:var(--blue);text-align:center;white-space:nowrap">${dur} ${unit.toLowerCase().slice(0,3)}</td>`;
+    tr.innerHTML=cells; tbody.appendChild(tr);
+  });
+  table.appendChild(tbody); updateGanttSummary();
+}
+
+function toggleGantt(ri,ci,btn){
+  const key=`${ri}-${ci}`;
+  state.ganttData[key]=!state.ganttData[key];
+  btn.classList.toggle('active',state.ganttData[key]);
+  const row=btn.closest('tr'),dur=row.querySelectorAll('.gantt-cell.active').length;
+  const unit=document.getElementById('gantt-unit').value;
+  row.lastElementChild.textContent=dur+' '+unit.toLowerCase().slice(0,3);
+  updateGanttSummary();
+}
+function addGanttRow(){state.ganttRows.push('Nueva actividad');renderGantt();}
+
+function updateGanttSummary(){
+  const unit=document.getElementById('gantt-unit').value;
+  const periods=parseInt(document.getElementById('gantt-periods').value)||8;
+  const colors=['var(--blue)','var(--orange)','var(--navy)','var(--success)','#7FB3D3','#9B59B6','#E74C3C','#27AE60'];
+  let html='<div class="bar-chart">';
+  state.ganttRows.forEach((act,ri)=>{
+    let dur=0;
+    for(let ci=0;ci<periods;ci++){if(state.ganttData[`${ri}-${ci}`])dur++;}
+    const pct=Math.round(dur/periods*100);
+    html+=`<div class="bar-row">
+      <span class="bar-label">${act||'Actividad '+(ri+1)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colors[ri%colors.length]}"><span>${dur} ${unit.toLowerCase().slice(0,3)}</span></div></div>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--lgray);min-width:36px">${pct}%</span>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('gantt-summary').innerHTML=html;
+}
+
+// ── INIT ────────────────────────────────────────────────────────
+function init(){
+  state.cf=[{concepto:'Renta del local',monto:3500},{concepto:'Salario base operador',monto:2000},{concepto:'Internet + teléfono',monto:500}];
+  state.cv=[{concepto:'Materia prima principal',monto:45},{concepto:'Empaques',monto:5},{concepto:'Mano de obra por pieza',monto:10}];
+  state.mpd=[{nombre:'Material principal',unidad:'kg',qty:1,costo:18},{nombre:'Insumo secundario',unidad:'ml',qty:2,costo:1.5},{nombre:'Empaque',unidad:'pza',qty:1,costo:3.5}];
+  state.mod=[{nombre:'Operación principal',resp:'Operador',tiempo:0.25,tarifa:40}];
+  state.gif=[{nombre:'Electricidad',base:'0.25 hrs × $4/hr',costo:1},{nombre:'Depreciación equipo',base:'por pieza',costo:0.8}];
+  initGantt();
+  renderAllTables();
+  document.getElementById('cvu-pvu').value=80;
+  document.getElementById('cvu-cvu').value=60;
+  document.getElementById('cvu-cf').value=6000;
+  document.getElementById('cvu-q').value=300;
+  calcCI(); calcCVU(); calcPE(); renderGantt();
+  document.getElementById('pe-pvu').value=80;
+  document.getElementById('pe-cvu').value=60;
+  document.getElementById('pe-cf').value=6000;
+  calcPE();
+}
+init();
+</script>
+</body>
+</html>
