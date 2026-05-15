@@ -93,7 +93,7 @@
   .field { margin-bottom: 14px; }
   .field label { display: block; font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 5px; font-family: var(--font-mono); letter-spacing: .3px; }
   .field label .hint { font-weight: 400; color: var(--lgray); font-size: 11px; margin-left: 4px; }
-  .field input[type=number], .field input[type=text], .field select { width: 100%; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 13.5px; color: var(--navy); background: #fff; transition: var(--transition); outline: none; -moz-appearance: textfield; }
+  .field input[type=number], .field input[type=text], .field select { width: 100%; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 13.5px; color: var(--navy); background: #fff; transition: var(--transition); outline: none; appearance: textfield; -moz-appearance: textfield; }
   .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(46,117,182,.12); }
   .field input[readonly] { background: var(--off); color: var(--blue); font-weight: 500; cursor: default; border-color: #C5D8F0; }
 
@@ -130,7 +130,7 @@
   .cost-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .cost-table tr:nth-child(even) td { background: var(--off); }
   .cost-table tfoot td { font-family: var(--font-mono); font-weight: 500; color: var(--navy); background: #D6E8F7; border-top: 2px solid var(--blue); }
-  .cost-table input[type=number], .cost-table input[type=text] { width: 100%; padding: 6px 9px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--navy); background: #fff; outline: none; -moz-appearance: textfield; }
+  .cost-table input[type=number], .cost-table input[type=text] { width: 100%; padding: 6px 9px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--navy); background: #fff; outline: none; appearance: none; -moz-appearance: textfield; }
   .cost-table input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(46,117,182,.12); }
   .cost-table .total-cell { font-family: var(--font-mono); font-size: 12.5px; color: var(--blue); font-weight: 500; }
   .delete-row { background: none; border: none; cursor: pointer; color: var(--lgray); font-size: 15px; padding: 2px 5px; border-radius: 4px; transition: var(--transition); }
@@ -174,6 +174,19 @@
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Ajustes para tablas anchas en panel 07 */
+  .table-responsive { overflow-x: auto; margin: 0 -1px; }
+  .table-responsive .cost-table { min-width: 680px; }
+  .table-responsive .cost-table th, 
+  .table-responsive .cost-table td { white-space: nowrap; }
+  .table-responsive .cost-table td:first-child,
+  .table-responsive .cost-table th:first-child { min-width: 140px; }
+  .table-responsive .cost-table td:nth-child(2),
+  .table-responsive .cost-table td:nth-child(3),
+  .table-responsive .cost-table td:nth-child(4),
+  .table-responsive .cost-table td:nth-child(5),
+  .table-responsive .cost-table td:nth-child(6) { min-width: 100px; }
 
   @media (max-width: 900px) {
     aside { width: 220px; } main { margin-left: 220px; }
@@ -433,7 +446,7 @@
           Calculadora de Análisis Técnico
         </div>
         <div style="font-size:13px;color:rgba(255,255,255,.4);font-family:'DM Sans',sans-serif">
-          Curso-Taller · Analisis Tecnico
+          Herramienta de apoyo a emprendimientos
         </div>
       </div>
 
@@ -494,12 +507,11 @@ const GATE_CONFIG = {
   logoEmoji: "🏭",
 
   /* URL de tu logo (deja "" para usar el emoji) */
-  /* Ejemplo: logoUrl: "https://tudominio.com/logo.png" */
   logoUrl: "logo.jpg",
 
   /* ── CLAVE MAESTRA del facilitador ── */
   masterKey: {
-    password: "FACILITADOR2025",   /* ← CAMBIA ESTO */
+    password: "FACILITADOR2026",   /* ← CAMBIA ESTO */
     label:    "Facilitador / Admin",
     badge:    "🔑 ADMIN"
   },
@@ -611,6 +623,9 @@ document.head.appendChild(style);
     <button class="nav-item" onclick="showPanel('pe',this)"><span class="icon">⚖️</span> Punto de Equilibrio <span class="nav-num">04</span></button>
     <button class="nav-item" onclick="showPanel('costeo',this)"><span class="icon">🧾</span> Hoja de Costeo <span class="nav-num">05</span></button>
     <button class="nav-item" onclick="showPanel('gantt',this)"><span class="icon">📅</span> Gráfica de Gantt <span class="nav-num">06</span></button>
+    <div class="nav-label" style="margin-top:8px">Herramientas avanzadas</div>
+    <button class="nav-item" onclick="showPanel('pe_multi',this)"><span class="icon">🔀</span> PE Multi-Producto <span class="nav-num">07</span></button>
+    <button class="nav-item" onclick="showPanel('informe',this)"><span class="icon">📄</span> Exportar Informe <span class="nav-num">08</span></button>
   </nav>
   <div class="sidebar-footer">v1.0 · Datos locales en sesión</div>
 </aside>
@@ -630,7 +645,7 @@ document.head.appendChild(style);
     <div class="panel-icon">🏠</div>
     <div>
       <div class="module-tag">Resumen general</div>
-      <div class="panel-title">Tu proyecto de emprendimiento</div>
+      <div class="panel-title">Tu proyecto de Emprendimiento</div>
       <div class="panel-desc">Ingresa los datos en cada módulo y aquí verás el resumen automático.</div>
     </div>
   </div>
@@ -732,9 +747,9 @@ document.head.appendChild(style);
       <div class="card-header"><h3>🔒 Costos Fijos Mensuales</h3><span class="badge">CF</span></div>
       <div class="card-body">
         <div class="alert info"><span class="alert-icon">ℹ️</span>No cambian sin importar cuánto produzcas: renta, salarios base, seguros.</div>
-        <table class="cost-table"><thead><tr><th>Concepto</th><th>Monto mensual ($)</th><th></th></tr></thead>
+        <table class="cost-table"><thead><tr><th>Concepto</th><th>Monto mensual ($)</th><th></th> </thead>
           <tbody id="cf-body"></tbody>
-          <tfoot><tr><td><strong>TOTAL CF</strong></td><td class="total-cell" id="cf-total">$0.00</td><td></td></tr></tfoot>
+          <tfoot><tr><td><strong>TOTAL CF</strong></td><td class="total-cell" id="cf-total">$0.00</td><td></td> </tfoot>
         </table>
         <button class="add-row-btn" onclick="addCFRow()">＋ Agregar concepto</button>
       </div>
@@ -743,9 +758,9 @@ document.head.appendChild(style);
       <div class="card-header"><h3>📈 Costos Variables Unitarios</h3><span class="badge">CVu</span></div>
       <div class="card-body">
         <div class="alert info"><span class="alert-icon">ℹ️</span>Se repiten por cada unidad que produces: materiales, empaques, mano de obra por pieza.</div>
-        <table class="cost-table"><thead><tr><th>Concepto</th><th>Costo por unidad ($)</th><th></th></tr></thead>
+        <table class="cost-table"><thead><tr><th>Concepto</th><th>Costo por unidad ($)</th><th></th> </thead>
           <tbody id="cv-body"></tbody>
-          <tfoot><tr><td><strong>TOTAL CVu</strong></td><td class="total-cell" id="cv-total">$0.00</td><td></td></tr></tfoot>
+          <tfoot><tr><td><strong>TOTAL CVu</strong></td><td class="total-cell" id="cv-total">$0.00</td><td></td> </tfoot>
         </table>
         <button class="add-row-btn" onclick="addCVRow()">＋ Agregar concepto</button>
       </div>
@@ -914,9 +929,9 @@ document.head.appendChild(style);
   <div class="card" style="margin-bottom:16px">
     <div class="card-header"><h3>🔵 A. Materia Prima Directa (MPD)</h3><span class="badge">MPD</span></div>
     <div class="card-body">
-      <table class="cost-table"><thead><tr><th>Insumo / Material</th><th>Unidad</th><th>Cantidad</th><th>Costo unit. ($)</th><th>Subtotal ($)</th><th></th></tr></thead>
+      <table class="cost-table"><thead><tr><th>Insumo / Material</th><th>Unidad</th><th>Cantidad</th><th>Costo unit. ($)</th><th>Subtotal ($)</th><th></th> </thead>
         <tbody id="mpd-body"></tbody>
-        <tfoot><tr><td colspan="4">SUBTOTAL MPD</td><td class="total-cell" id="mpd-total">$0.00</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="4">SUBTOTAL MPD</td><td class="total-cell" id="mpd-total">$0.00</td><td></td> </tfoot>
       </table>
       <button class="add-row-btn" onclick="addMPDRow()">＋ Agregar insumo</button>
     </div>
@@ -925,9 +940,9 @@ document.head.appendChild(style);
   <div class="card" style="margin-bottom:16px">
     <div class="card-header"><h3>🟢 B. Mano de Obra Directa (MOD)</h3><span class="badge">MOD</span></div>
     <div class="card-body">
-      <table class="cost-table"><thead><tr><th>Actividad</th><th>Responsable</th><th>Tiempo (hrs)</th><th>Tarifa ($/hr)</th><th>Subtotal ($)</th><th></th></tr></thead>
+      <table class="cost-table"><thead><tr><th>Actividad</th><th>Responsable</th><th>Tiempo (hrs)</th><th>Tarifa ($/hr)</th><th>Subtotal ($)</th><th></th> </thead>
         <tbody id="mod-body"></tbody>
-        <tfoot><tr><td colspan="4">SUBTOTAL MOD</td><td class="total-cell" id="mod-total">$0.00</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="4">SUBTOTAL MOD</td><td class="total-cell" id="mod-total">$0.00</td><td></td> </tfoot>
       </table>
       <button class="add-row-btn" onclick="addMODRow()">＋ Agregar operación</button>
     </div>
@@ -936,9 +951,9 @@ document.head.appendChild(style);
   <div class="card" style="margin-bottom:20px">
     <div class="card-header"><h3>🟡 C. Gastos Indirectos de Fabricación (GIF)</h3><span class="badge">GIF</span></div>
     <div class="card-body">
-      <table class="cost-table"><thead><tr><th>Concepto</th><th>Base de cálculo</th><th>Costo por unidad ($)</th><th></th></tr></thead>
+      <table class="cost-table"><thead><tr><th>Concepto</th><th>Base de cálculo</th><th>Costo por unidad ($)</th><th></th> </thead>
         <tbody id="gif-body"></tbody>
-        <tfoot><tr><td colspan="2">SUBTOTAL GIF</td><td class="total-cell" id="gif-total">$0.00</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="2">SUBTOTAL GIF</td><td class="total-cell" id="gif-total">$0.00</td><td></td> </tfoot>
       </table>
       <button class="add-row-btn" onclick="addGIFRow()">＋ Agregar gasto indirecto</button>
     </div>
@@ -1016,6 +1031,200 @@ document.head.appendChild(style);
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════
+     PANEL 07 — PE MULTI-PRODUCTO (AHORA DENTRO DEL MAIN)
+     ══════════════════════════════════════════════════════════════ -->
+<div id="panel-pe_multi" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">🔀</div>
+    <div>
+      <div class="module-tag">Módulo 07</div>
+      <div class="panel-title">Punto de Equilibrio Multi-Producto</div>
+      <div class="panel-desc">Calcula el PE ponderado cuando tu empresa maneja más de un producto o línea de negocio.</div>
+    </div>
+  </div>
+
+  <div class="alert info" style="margin-bottom:20px">
+    <span class="alert-icon">ℹ️</span>
+    <div>
+      <strong>¿Cómo funciona?</strong> Cuando vendes varios productos, el PE no puede calcularse
+      con una sola fórmula. Se usa la <strong>Mezcla de Ventas</strong>: la proporción en que
+      se vende cada producto. El resultado es el <em>PE ponderado</em> total de la empresa.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-header">
+      <h3>🔒 Costos Fijos Totales de la Empresa</h3><span class="badge">CF</span>
+    </div>
+    <div class="card-body">
+      <div class="grid-3">
+        <div class="field">
+          <label>Costos Fijos Mensuales ($)</label>
+          <input type="number" id="pem-cf" value="0" min="0" step="0.01"
+            oninput="calcPEMulti()" placeholder="Se puede importar del Mód. 02">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:14px">
+          <button class="calc-btn" style="margin:0" onclick="importCFtoPEMulti()">
+            🔄 Importar CF del Módulo 02
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-header">
+      <h3>📦 Productos / Líneas de Negocio</h3>
+      <span class="badge">MEZCLA DE VENTAS</span>
+    </div>
+    <div class="card-body">
+      <div class="alert warn" style="margin-bottom:14px">
+        <span class="alert-icon">⚠️</span>
+        Los porcentajes de mezcla deben sumar <strong>100%</strong>. El sistema lo valida automáticamente.
+      </div>
+      <!-- Contenedor responsive para la tabla -->
+      <div class="table-responsive">
+        <table class="cost-table" id="pem-table">
+          <thead>
+            <tr>
+              <th>Producto / Línea</th>
+              <th style="width:110px">PVu ($)</th>
+              <th style="width:110px">CVu ($)</th>
+              <th style="width:100px">MCu ($)</th>
+              <th style="width:100px">Mezcla (%)</th>
+              <th style="width:110px">MCu Pond. ($)</th>
+              <th style="width:40px"></th>
+             </tr>
+          </thead>
+          <tbody id="pem-body"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"><strong>MCu PONDERADO TOTAL</strong></td>
+              <td class="total-cell" id="pem-mezcla-total" style="text-align:center">0%</td>
+              <td class="total-cell" id="pem-mcu-pond">$0.00</td>
+              <td></td>
+             </tr>
+          </tfoot>
+        </table>
+      </div>
+      <button class="add-row-btn" onclick="addPEMRow()">＋ Agregar producto</button>
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div class="grid-2" style="margin-bottom:20px">
+    <div>
+      <div class="result-box orange" style="padding:22px;border-radius:14px;text-align:center;margin-bottom:14px">
+        <div class="rb-label">PE Ponderado (unidades totales)</div>
+        <div class="rb-value" id="pem-pe-uds" style="font-size:34px">—</div>
+        <div class="rb-unit">unidades/mes para toda la empresa</div>
+      </div>
+      <div class="result-box blue" style="padding:22px;border-radius:14px;text-align:center">
+        <div class="rb-label">PE Ponderado (pesos totales)</div>
+        <div class="rb-value" id="pem-pe-pesos" style="font-size:28px">—</div>
+        <div class="rb-unit">$ ventas mínimas/mes</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📊 PE por producto (desglose)</h3></div>
+      <div class="card-body" id="pem-desglose">
+        <div class="alert info"><span class="alert-icon">💡</span>Agrega productos para ver el desglose.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERPRETACIÓN -->
+  <div class="card">
+    <div class="card-header"><h3>📋 Interpretación y fórmula aplicada</h3></div>
+    <div class="card-body">
+      <div class="formula">
+        <div class="f-label">PE Multi-Producto — Fórmula</div>
+        MCu Ponderado = Σ (MCu_i × Mezcla_i)  →  PE Total = CF ÷ MCu Ponderado  →  PE_i = PE Total × Mezcla_i
+      </div>
+      <div id="pem-alert" class="alert info" style="margin-top:12px">
+        <span class="alert-icon">💡</span>
+        <span id="pem-alert-text">Ingresa los datos para ver el análisis ponderado.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PANEL 08 — EXPORTAR INFORME (AHORA DENTRO DEL MAIN)
+     ══════════════════════════════════════════════════════════════ -->
+<div id="panel-informe" class="panel">
+  <div class="panel-header">
+    <div class="panel-icon">📄</div>
+    <div>
+      <div class="module-tag">Módulo 08</div>
+      <div class="panel-title">Exportar Informe Completo</div>
+      <div class="panel-desc">Descarga todos los cálculos en un documento HTML o PDF con tu información personalizada.</div>
+    </div>
+  </div>
+
+  <!-- OPCIONES -->
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-header"><h3>🌐 Descargar como HTML</h3><span class="badge">RECOMENDADO</span></div>
+      <div class="card-body">
+        <div class="alert good" style="margin-bottom:14px">
+          <span class="alert-icon">✅</span>
+          Genera un archivo <code>.html</code> que se abre en cualquier navegador. Incluye todos
+          los datos, tablas y cálculos con el mismo diseño visual de la herramienta.
+          <strong>No requiere software adicional.</strong>
+        </div>
+        <ul style="font-size:13px;color:var(--gray);padding-left:18px;line-height:2">
+          <li>Todos los módulos en un solo archivo</li>
+          <li>Apto para imprimir desde el navegador</li>
+          <li>Compatible con Chrome, Edge, Firefox, Safari</li>
+          <li>Se guarda en tu carpeta de Descargas</li>
+        </ul>
+        <button class="calc-btn" style="margin-top:16px" onclick="exportarHTML()">
+          ⬇ Descargar Informe HTML
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📑 Descargar como PDF</h3></div>
+      <div class="card-body">
+        <div class="alert info" style="margin-bottom:14px">
+          <span class="alert-icon">ℹ️</span>
+          El PDF se genera abriendo el informe HTML en el navegador y usando
+          la función de impresión (<strong>Ctrl+P</strong> → "Guardar como PDF").
+          Es el método más confiable para mantener el formato.
+        </div>
+        <ol style="font-size:13px;color:var(--gray);padding-left:18px;line-height:2.2">
+          <li>Haz clic en <strong>"Descargar Informe HTML"</strong></li>
+          <li>Abre el archivo descargado en Chrome o Edge</li>
+          <li>Presiona <code>Ctrl + P</code> (o <code>Cmd + P</code> en Mac)</li>
+          <li>Selecciona <strong>"Guardar como PDF"</strong></li>
+          <li>Elige el tamaño <strong>Carta</strong> y haz clic en Guardar</li>
+        </ol>
+        <button class="calc-btn orange" style="margin-top:16px" onclick="exportarHTML();showPDFTip()">
+          📑 Iniciar proceso PDF
+        </button>
+        <div id="pdf-tip" style="display:none" class="alert good" style="margin-top:10px">
+          <span class="alert-icon">✅</span>El HTML fue descargado. Ábrelo y usa Ctrl+P para guardar como PDF.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVISUALIZACIÓN -->
+  <div class="card">
+    <div class="card-header"><h3>👁 Vista previa del informe</h3><span class="badge">PREVIEW</span></div>
+    <div class="card-body">
+      <div id="informe-preview" style="background:var(--off);border:1px solid var(--border);border-radius:8px;padding:24px;font-size:13px;line-height:1.8;max-height:520px;overflow-y:auto">
+        <div style="text-align:center;color:var(--lgray)">Haz clic en "Actualizar vista previa" para generar el informe.</div>
+      </div>
+      <button class="calc-btn" style="margin-top:14px;background:var(--blue)" onclick="refreshPreview()">
+        🔄 Actualizar vista previa
+      </button>
+    </div>
+  </div>
+</div>
+
 </main>
 </div>
 
@@ -1028,6 +1237,8 @@ const titles = {
   costos: ['Módulo 02 · Clasificación de Costos','Costos Fijos vs. Variables'],
   cvu:    ['Módulo 03 · CVU y Utilidad','Precio, Costo, Volumen y Utilidad'],
   pe:     ['Módulo 04 · Punto de Equilibrio','El umbral mínimo de ventas'],
+  pe_multi: ['Módulo 07 · PE Multi-Producto','Punto de Equilibrio con mezcla de productos'],
+  informe:  ['Módulo 08 · Exportar Informe','Descarga el reporte completo en HTML o PDF'],
   costeo: ['Módulo 05 · Hoja de Costeo','Costo real por unidad producida'],
   gantt:  ['Módulo 06 · Gráfica de Gantt','Planificación del proceso productivo'],
 };
@@ -1272,7 +1483,7 @@ function renderMODTable(){
   const body=document.getElementById('mod-body'); body.innerHTML='';
   state.mod.forEach((r,i)=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><input type="text" value="${r.nombre}" placeholder="Actividad..." oninput="state.mod[${i}].nombre=this.value"></td>
+    tr.innerHTML=`<tr><input type="text" value="${r.nombre}" placeholder="Actividad..." oninput="state.mod[${i}].nombre=this.value"></td>
     <td><input type="text" value="${r.resp}" placeholder="Responsable" oninput="state.mod[${i}].resp=this.value"></td>
     <td><input type="number" value="${r.tiempo}" min="0" step="0.01" oninput="state.mod[${i}].tiempo=parseFloat(this.value)||0;calcCosteo()"></td>
     <td><input type="number" value="${r.tarifa}" min="0" step="0.01" oninput="state.mod[${i}].tarifa=parseFloat(this.value)||0;calcCosteo()"></td>
@@ -1287,7 +1498,7 @@ function renderGIFTable(){
   const body=document.getElementById('gif-body'); body.innerHTML='';
   state.gif.forEach((r,i)=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><input type="text" value="${r.nombre}" placeholder="Concepto GIF..." oninput="state.gif[${i}].nombre=this.value"></td>
+    tr.innerHTML=`<tr><input type="text" value="${r.nombre}" placeholder="Concepto GIF..." oninput="state.gif[${i}].nombre=this.value"></td>
     <td><input type="text" value="${r.base}" placeholder="Ej: 0.25 hrs × $4/hr" oninput="state.gif[${i}].base=this.value"></td>
     <td><input type="number" value="${r.costo}" min="0" step="0.01" oninput="state.gif[${i}].costo=parseFloat(this.value)||0;calcCosteo()"></td>
     <td><button class="delete-row" onclick="state.gif.splice(${i},1);renderGIFTable();calcCosteo()">✕</button></td>`;
@@ -1330,7 +1541,7 @@ function renderGantt(){
   const thead=document.createElement('thead');
   let thRow=`<tr><th style="min-width:150px;text-align:left;padding-left:10px">Actividad</th>`;
   for(let i=0;i<periods;i++) thRow+=`<th>${unit.charAt(0)}${i+1}</th>`;
-  thRow+=`<th>Dur.</th></tr>`;
+  thRow+=`<th>Dur.</th>`;
   thead.innerHTML=thRow; table.appendChild(thead);
   const tbody=document.createElement('tbody');
   state.ganttRows.forEach((act,ri)=>{
@@ -1397,6 +1608,497 @@ function init(){
   calcPE();
 }
 init();
+
+// ── PE MULTI-PRODUCTO ───────────────────────────────────────────
+const pemState = { rows: [], cf: 0 };
+
+function importCFtoPEMulti() {
+  const cf = getTotalCF();
+  document.getElementById('pem-cf').value = cf.toFixed(2);
+  pemState.cf = cf;
+  calcPEMulti();
+}
+
+function addPEMRow(nombre='', pvu=0, cvu=0, mezcla=0) {
+  pemState.rows.push({ nombre, pvu, cvu, mezcla });
+  renderPEMTable();
+}
+
+function renderPEMTable() {
+  const body = document.getElementById('pem-body');
+  body.innerHTML = '';
+  pemState.rows.forEach((r, i) => {
+    const mcu = (r.pvu - r.cvu).toFixed(2);
+    const mcuPond = ((r.pvu - r.cvu) * (r.mezcla / 100)).toFixed(4);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${r.nombre}" placeholder="Ej: Playera estampada"
+        oninput="pemState.rows[${i}].nombre=this.value"></td>
+      <td><input type="number" value="${r.pvu}" min="0" step="0.01"
+        oninput="pemState.rows[${i}].pvu=parseFloat(this.value)||0;calcPEMulti()"></td>
+      <td><input type="number" value="${r.cvu}" min="0" step="0.01"
+        oninput="pemState.rows[${i}].cvu=parseFloat(this.value)||0;calcPEMulti()"></td>
+      <td class="total-cell" id="pem-mcu-${i}" style="color:var(--blue)">${fmtM(parseFloat(mcu))}</td>
+      <td><input type="number" value="${r.mezcla}" min="0" max="100" step="0.1"
+        oninput="pemState.rows[${i}].mezcla=parseFloat(this.value)||0;calcPEMulti()"></td>
+      <td class="total-cell" id="pem-pond-${i}" style="color:var(--orange)">${fmtM(parseFloat(mcuPond))}</td>
+      <td><button class="delete-row"
+        onclick="pemState.rows.splice(${i},1);renderPEMTable();calcPEMulti()">✕</button></td>`;
+    body.appendChild(tr);
+  });
+  calcPEMulti();
+}
+
+function calcPEMulti() {
+  const cf = parseFloat(document.getElementById('pem-cf').value) || 0;
+  pemState.cf = cf;
+
+  // Update MCu per row
+  pemState.rows.forEach((r, i) => {
+    const mcu = r.pvu - r.cvu;
+    const el = document.getElementById(`pem-mcu-${i}`);
+    if (el) el.textContent = fmtM(mcu);
+    const pond = mcu * (r.mezcla / 100);
+    const elp = document.getElementById(`pem-pond-${i}`);
+    if (elp) elp.textContent = fmtM(pond);
+  });
+
+  // Totals
+  const totalMezcla = pemState.rows.reduce((s, r) => s + (r.mezcla || 0), 0);
+  const mcuPond = pemState.rows.reduce((s, r) => s + (r.pvu - r.cvu) * (r.mezcla / 100), 0);
+
+  document.getElementById('pem-mezcla-total').textContent = fmt(totalMezcla, 1) + '%';
+  document.getElementById('pem-mcu-pond').textContent = fmtM(mcuPond);
+
+  // Validation
+  const al = document.getElementById('pem-alert');
+  const at = document.getElementById('pem-alert-text');
+
+  if (pemState.rows.length === 0) {
+    document.getElementById('pem-pe-uds').textContent = '—';
+    document.getElementById('pem-pe-pesos').textContent = '—';
+    document.getElementById('pem-desglose').innerHTML = '<div class="alert info"><span class="alert-icon">💡</span>Agrega productos para ver el desglose.</div>';
+    al.className = 'alert info'; at.textContent = 'Agrega al menos un producto para calcular.';
+    return;
+  }
+
+  const mezclaOk = Math.abs(totalMezcla - 100) < 0.5;
+  if (!mezclaOk) {
+    al.className = 'alert warn';
+    at.textContent = `⚠️ La mezcla suma ${fmt(totalMezcla, 1)}%. Debe sumar exactamente 100%.`;
+    document.getElementById('pem-pe-uds').textContent = '⚠️';
+    document.getElementById('pem-pe-pesos').textContent = '—';
+    return;
+  }
+
+  if (mcuPond <= 0) {
+    al.className = 'alert bad';
+    at.textContent = '⚠️ El MCu ponderado es ≤ 0. Revisa que los precios sean mayores a los costos variables.';
+    document.getElementById('pem-pe-uds').textContent = '∞';
+    document.getElementById('pem-pe-pesos').textContent = '—';
+    return;
+  }
+
+  // PE Calculation
+  const peTotal = cf / mcuPond;
+  const pePesos = pemState.rows.reduce((s, r) => s + peTotal * (r.mezcla / 100) * r.pvu, 0);
+
+  document.getElementById('pem-pe-uds').textContent = fmt(peTotal, 1);
+  document.getElementById('pem-pe-pesos').textContent = fmtM(pePesos);
+
+  // Desglose por producto
+  let desgloseHTML = '<div class="bar-chart">';
+  const colors = ['var(--blue)', 'var(--orange)', 'var(--navy)', 'var(--success)', '#9B59B6', '#E74C3C'];
+  pemState.rows.forEach((r, i) => {
+    const peI = Math.round(peTotal * r.mezcla / 100 * 10) / 10;
+    const peIPesos = peI * r.pvu;
+    const pct = r.mezcla;
+    desgloseHTML += `
+      <div style="margin-bottom:14px;padding:12px;background:var(--off);border-radius:8px;border-left:4px solid ${colors[i % colors.length]}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <strong style="font-size:13px;color:var(--navy)">${r.nombre || 'Producto ' + (i + 1)}</strong>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--lgray)">${fmt(pct, 1)}% de las ventas</span>
+        </div>
+        <div class="grid-3" style="gap:8px">
+          <div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid var(--border)">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--lgray);margin-bottom:2px">PE (uds)</div>
+            <div style="font-family:var(--font-mono);font-size:16px;font-weight:500;color:${colors[i % colors.length]}">${fmt(peI, 1)}</div>
+          </div>
+          <div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid var(--border)">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--lgray);margin-bottom:2px">PE ($)</div>
+            <div style="font-family:var(--font-mono);font-size:16px;font-weight:500;color:${colors[i % colors.length]}">${fmtM(peIPesos)}</div>
+          </div>
+          <div style="text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid var(--border)">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--lgray);margin-bottom:2px">MCu</div>
+            <div style="font-family:var(--font-mono);font-size:16px;font-weight:500;color:${colors[i % colors.length]}">${fmtM(r.pvu - r.cvu)}</div>
+          </div>
+        </div>
+      </div>`;
+  });
+  desgloseHTML += '</div>';
+  document.getElementById('pem-desglose').innerHTML = desgloseHTML;
+
+  al.className = 'alert good';
+  at.textContent = `✅ Con CF de ${fmtM(cf)} y MCu ponderado de ${fmtM(mcuPond)}, necesitas vender ${fmt(peTotal, 1)} unidades totales por mes (${fmtM(pePesos)}) para cubrir todos los costos de la empresa.`;
+}
+
+// ── INFORME / EXPORT ───────────────────────────────────────────
+function buildInformeHTML() {
+  const empresa = document.getElementById('h-empresa').value || 'Mi Empresa';
+  const nombre  = document.getElementById('h-nombre').value || '—';
+  const producto = document.getElementById('h-producto').value || '—';
+  const fecha   = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const cf      = getTotalCF();
+  const cvu_v   = getTotalCV();
+  const pvu_v   = parseFloat(document.getElementById('cvu-pvu').value) || 0;
+  const q_v     = parseFloat(document.getElementById('cvu-q').value) || 0;
+  const mcu_v   = pvu_v - cvu_v;
+  const it_v    = pvu_v * q_v;
+  const ct_v    = cf + cvu_v * q_v;
+  const util_v  = it_v - ct_v;
+  const rmc_v   = pvu_v > 0 ? mcu_v / pvu_v * 100 : 0;
+  const pe_uds  = mcu_v > 0 ? cf / mcu_v : 0;
+  const pe_peso = pe_uds * pvu_v;
+
+  const ciRec   = parseFloat(document.getElementById('ci-recursos').value) || 0;
+  const ciUph   = parseFloat(document.getElementById('ci-uph').value) || 0;
+  const ciHpd   = parseFloat(document.getElementById('ci-hpd').value) || 8;
+  const ciDpm   = parseFloat(document.getElementById('ci-dpm').value) || 25;
+  const ciEfic  = (parseFloat(document.getElementById('ci-efic').value) || 80) / 100;
+  const ciMesR  = ciRec * ciUph * ciHpd * ciDpm * ciEfic;
+
+  const mpd_t   = state.mpd.reduce((s, r) => s + r.qty * r.costo, 0);
+  const mod_t   = state.mod.reduce((s, r) => s + r.tiempo * r.tarifa, 0);
+  const gif_t   = state.gif.reduce((s, r) => s + r.costo, 0);
+  const cpu     = mpd_t + mod_t + gif_t;
+  const pctAdm  = (parseFloat(document.getElementById('pct-adm').value) || 0) / 100;
+  const pctUtil = (parseFloat(document.getElementById('pct-util').value) || 0) / 100;
+  const adm     = cpu * pctAdm;
+  const ctu     = cpu + adm;
+  const margen  = ctu * pctUtil;
+  const pv_sug  = ctu + margen;
+
+  // Multi-PE data
+  const pemRows = pemState.rows;
+  const pemCF   = parseFloat(document.getElementById('pem-cf').value) || 0;
+  const pemMcuPond = pemRows.reduce((s, r) => s + (r.pvu - r.cvu) * (r.mezcla / 100), 0);
+  const pemPeUds   = pemMcuPond > 0 ? pemCF / pemMcuPond : 0;
+  const pemPePesos = pemRows.reduce((s, r) => s + pemPeUds * (r.mezcla / 100) * r.pvu, 0);
+
+  // CF rows HTML
+  const cfRowsHTML = state.cf.map(r =>
+    `<tr><td>${r.concepto || '—'}</td><td style="text-align:right">${fmtM(parseFloat(r.monto)||0)}</td></tr>`
+  ).join('') || '<tr><td colspan="2" style="text-align:center;color:#888">Sin datos</td></tr>';
+
+  const cvRowsHTML = state.cv.map(r =>
+    `<tr><td>${r.concepto || '—'}</td><td style="text-align:right">${fmtM(parseFloat(r.monto)||0)}</td></tr>`
+  ).join('') || '<tr><td colspan="2" style="text-align:center;color:#888">Sin datos</td></tr>';
+
+  const mpdRowsHTML = state.mpd.map(r =>
+    `<tr><td>${r.nombre||'—'}</td><td>${r.unidad||''}</td><td style="text-align:right">${fmt(r.qty,2)}</td><td style="text-align:right">${fmtM(r.costo)}</td><td style="text-align:right">${fmtM(r.qty*r.costo)}</td></tr>`
+  ).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Sin datos</td></tr>';
+
+  const modRowsHTML = state.mod.map(r =>
+    `<tr><td>${r.nombre||'—'}</td><td>${r.resp||''}</td><td style="text-align:right">${fmt(r.tiempo,3)}</td><td style="text-align:right">${fmtM(r.tarifa)}</td><td style="text-align:right">${fmtM(r.tiempo*r.tarifa)}</td></tr>`
+  ).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Sin datos</td></tr>';
+
+  const gifRowsHTML = state.gif.map(r =>
+    `<tr><td>${r.nombre||'—'}</td><td>${r.base||''}</td><td style="text-align:right">${fmtM(r.costo)}</td></tr>`
+  ).join('') || '<tr><td colspan="3" style="text-align:center;color:#888">Sin datos</td></tr>';
+
+  const pemRowsHTML = pemRows.length > 0 ? pemRows.map(r => {
+    const mcu = r.pvu - r.cvu;
+    const peI = pemPeUds * r.mezcla / 100;
+    return `<tr>
+      <td>${r.nombre||'—'}</td>
+      <td style="text-align:right">${fmtM(r.pvu)}</td>
+      <td style="text-align:right">${fmtM(r.cvu)}</td>
+      <td style="text-align:right">${fmtM(mcu)}</td>
+      <td style="text-align:right">${fmt(r.mezcla,1)}%</td>
+      <td style="text-align:right;font-weight:bold">${fmt(peI,1)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:#888">Sin datos de PE multi-producto</td></tr>';
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Análisis Técnico — ${empresa}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f7fb;color:#333;font-size:13px;line-height:1.6}
+  .page{max-width:900px;margin:0 auto;padding:24px 20px 60px}
+  /* COVER */
+  .cover{background:linear-gradient(135deg,#1A3A5C,#2E75B6);color:#fff;border-radius:16px;padding:44px 40px;margin-bottom:28px;position:relative;overflow:hidden}
+  .cover::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:rgba(255,255,255,.06);border-radius:50%}
+  .cover .tag{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.6);text-transform:uppercase;margin-bottom:10px}
+  .cover h1{font-size:32px;font-weight:800;margin-bottom:8px}
+  .cover .sub{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:24px}
+  .cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(255,255,255,.08);border-radius:10px;padding:16px}
+  .cover-item .cl{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+  .cover-item .cv{font-size:14px;font-weight:600;color:#fff}
+  /* SECTIONS */
+  .section{background:#fff;border-radius:12px;border:1px solid #D0DFF0;box-shadow:0 2px 12px rgba(26,58,92,.06);margin-bottom:20px;overflow:hidden}
+  .section-head{background:#1A3A5C;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:10px}
+  .section-head .sh-num{background:#E8943A;color:#fff;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+  .section-head .sh-title{font-size:15px;font-weight:700}
+  .section-head .sh-sub{font-size:11px;color:rgba(255,255,255,.6);margin-left:auto}
+  .section-body{padding:20px}
+  /* KPI GRID */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0}
+  .kpi{background:#f4f7fb;border-radius:8px;padding:14px 10px;text-align:center;border-left:4px solid #2E75B6}
+  .kpi.orange{border-left-color:#E8943A}
+  .kpi.green{border-left-color:#27AE60;background:#EAFAF1}
+  .kpi.red{border-left-color:#E74C3C;background:#FDEDEC}
+  .kpi-label{font-size:10px;color:#8A9AB5;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .kpi-val{font-size:20px;font-weight:800;color:#1A3A5C;font-family:monospace}
+  .kpi.orange .kpi-val{color:#B36020}
+  .kpi.green .kpi-val{color:#1E7A44}
+  .kpi.red .kpi-val{color:#922B21}
+  /* TABLES */
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px}
+  th{background:#1A3A5C;color:#fff;padding:8px 12px;text-align:left;font-size:11px;letter-spacing:.3px}
+  td{padding:8px 12px;border-bottom:1px solid #EEF3FB}
+  tr:nth-child(even) td{background:#F4F7FB}
+  tfoot td{background:#D6E8F7;font-weight:700;color:#1A3A5C;border-top:2px solid #2E75B6}
+  /* FORMULA */
+  .formula-box{background:#EBF5FB;border:1px dashed #AED6F1;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:#1A5276;margin:10px 0}
+  /* RESULT HIGHLIGHT */
+  .result-highlight{background:#1A3A5C;color:#fff;border-radius:10px;padding:14px 20px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
+  .result-highlight .rh-label{font-size:12px;color:rgba(255,255,255,.7)}
+  .result-highlight .rh-val{font-family:monospace;font-size:20px;font-weight:700;color:#E8943A}
+  .result-highlight.green-hl{background:#1A6B3C}
+  .result-highlight.green-hl .rh-val{color:#7FCDA0}
+  /* DIVIDER */
+  hr{border:none;border-top:1px solid #D0DFF0;margin:14px 0}
+  /* STATUS */
+  .status-good{background:#EAFAF1;border:1px solid #A9DFBF;border-radius:6px;padding:8px 12px;color:#1E7A44;font-size:12px;margin-top:8px}
+  .status-warn{background:#FEF9E7;border:1px solid #F9E79F;border-radius:6px;padding:8px 12px;color:#784212;font-size:12px;margin-top:8px}
+  /* FOOTER */
+  .footer{text-align:center;font-size:11px;color:#8A9AB5;margin-top:32px;padding-top:16px;border-top:1px solid #D0DFF0}
+  /* PRINT */
+  @media print{body{background:#fff}.page{padding:0 10px}.cover{border-radius:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}.section{break-inside:avoid}}
+
+  /* COVER LOGO */
+  .cover-logo {
+  width: 20%;
+  height: auto;
+  min-width: 80px;
+  max-width: 80px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- PORTADA -->
+<div class="cover">
+  <img src="logo.jpg" class="cover-logo">
+  <div class="tag">Propti Analytics · Programa de Formación Emprendedora</div>
+  <h1>Informe de Análisis de Técnico</h1>
+  <div class="sub">Curso-Taller: Análisis Técnico</div>
+  <div class="cover-grid">
+    <div class="cover-item"><div class="cl">Emprendedor/a</div><div class="cv">${nombre}</div></div>
+    <div class="cover-item"><div class="cl">Empresa / Proyecto</div><div class="cv">${empresa}</div></div>
+    <div class="cover-item"><div class="cl">Producto / Servicio</div><div class="cv">${producto}</div></div>
+    <div class="cover-item"><div class="cl">Fecha de generación</div><div class="cv">${fecha}</div></div>
+  </div>
+</div>
+
+<!-- KPIs RESUMEN -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">★</div><div class="sh-title">Indicadores Clave del Proyecto</div><div class="sh-sub">Resumen ejecutivo</div></div>
+  <div class="section-body">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Cap. Instalada / Mes</div><div class="kpi-val">${fmt(ciMesR,0)}</div><div style="font-size:10px;color:#8A9AB5;margin-top:2px">unidades</div></div>
+      <div class="kpi orange"><div class="kpi-label">Costos Fijos</div><div class="kpi-val">${fmtM(cf)}</div><div style="font-size:10px;color:#8A9AB5;margin-top:2px">por mes</div></div>
+      <div class="kpi ${pe_uds > 0 && pe_uds <= ciMesR * 0.7 ? 'green' : 'orange'}">
+        <div class="kpi-label">Punto de Equilibrio</div>
+        <div class="kpi-val">${pe_uds > 0 ? fmt(pe_uds,1) : '—'}</div>
+        <div style="font-size:10px;color:#8A9AB5;margin-top:2px">uds/mes</div>
+      </div>
+      <div class="kpi ${util_v >= 0 ? 'green' : 'red'}">
+        <div class="kpi-label">Utilidad Proyectada</div>
+        <div class="kpi-val">${fmtM(util_v)}</div>
+        <div style="font-size:10px;color:#8A9AB5;margin-top:2px">$/mes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MÓDULO 1: CAPACIDAD -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">1</div><div class="sh-title">Capacidad Instalada</div><div class="sh-sub">Módulo 01</div></div>
+  <div class="section-body">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Recursos (máq/pers)</div><div class="kpi-val">${fmt(ciRec,0)}</div></div>
+      <div class="kpi"><div class="kpi-label">Uds por hora</div><div class="kpi-val">${fmt(ciUph,1)}</div></div>
+      <div class="kpi"><div class="kpi-label">Días/mes productivos</div><div class="kpi-val">${fmt(ciDpm,0)}</div></div>
+      <div class="kpi orange"><div class="kpi-label">Eficiencia real</div><div class="kpi-val">${fmt(ciEfic*100,0)}%</div></div>
+    </div>
+    <hr>
+    <div class="result-highlight"><div class="rh-label">Capacidad Instalada Mensual (con eficiencia)</div><div class="rh-val">${fmt(ciMesR,0)} uds/mes</div></div>
+  </div>
+</div>
+
+<!-- MÓDULO 2: COSTOS -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">2</div><div class="sh-title">Clasificación de Costos</div><div class="sh-sub">Módulo 02</div></div>
+  <div class="section-body">
+    <p style="font-weight:700;color:#1A3A5C;margin-bottom:8px">Costos Fijos Mensuales</p>
+    <table><thead><tr><th>Concepto</th><th style="text-align:right">Monto ($)</th></tr></thead>
+      <tbody>${cfRowsHTML}</tbody>
+      <tfoot><tr><td>TOTAL COSTOS FIJOS (CF)</td><td style="text-align:right">${fmtM(cf)}</td></tr></tfoot>
+    </table>
+    <p style="font-weight:700;color:#1A3A5C;margin:14px 0 8px">Costos Variables Unitarios</p>
+    <table><thead><tr><th>Concepto</th><th style="text-align:right">Costo/unidad ($)</th></tr></thead>
+      <tbody>${cvRowsHTML}</tbody>
+      <tfoot><tr><td>TOTAL COSTO VARIABLE UNITARIO (CVu)</td><td style="text-align:right">${fmtM(cvu_v)}</td></tr></tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- MÓDULO 3: CVU -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">3</div><div class="sh-title">Análisis Costo-Volumen-Utilidad</div><div class="sh-sub">Módulo 03</div></div>
+  <div class="section-body">
+    <div class="formula-box">U = (PVu − CVu) × Q − CF = (${fmtM(pvu_v)} − ${fmtM(cvu_v)}) × ${fmt(q_v,0)} − ${fmtM(cf)}</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">PVu</div><div class="kpi-val">${fmtM(pvu_v)}</div></div>
+      <div class="kpi orange"><div class="kpi-label">MCu</div><div class="kpi-val">${fmtM(mcu_v)}</div></div>
+      <div class="kpi"><div class="kpi-label">RMC</div><div class="kpi-val">${fmt(rmc_v,1)}%</div></div>
+      <div class="kpi"><div class="kpi-label">Q proyectado</div><div class="kpi-val">${fmt(q_v,0)} uds</div></div>
+    </div>
+    <hr>
+    <table style="margin-top:10px"><thead><tr><th>Concepto</th><th style="text-align:right">Valor ($)</th></tr></thead>
+      <tbody>
+        <tr><td>Ingresos Totales (PVu × Q)</td><td style="text-align:right">${fmtM(it_v)}</td></tr>
+        <tr><td>Costos Variables Totales (CVu × Q)</td><td style="text-align:right">${fmtM(cvu_v*q_v)}</td></tr>
+        <tr><td>Costos Fijos</td><td style="text-align:right">${fmtM(cf)}</td></tr>
+        <tr><td>Costo Total</td><td style="text-align:right">${fmtM(ct_v)}</td></tr>
+      </tbody>
+      <tfoot><tr><td>UTILIDAD NETA PROYECTADA</td><td style="text-align:right">${fmtM(util_v)}</td></tr></tfoot>
+    </table>
+    <div class="${util_v >= 0 ? 'status-good' : 'status-warn'}">
+      ${util_v >= 0 ? '✅ La proyección muestra utilidad positiva con ' + fmt(q_v,0) + ' unidades.' : '⚠️ La proyección muestra pérdida. Considera aumentar el precio o reducir costos.'}
+    </div>
+  </div>
+</div>
+
+<!-- MÓDULO 4: PE -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">4</div><div class="sh-title">Punto de Equilibrio (1 Producto)</div><div class="sh-sub">Módulo 04</div></div>
+  <div class="section-body">
+    <div class="formula-box">PE (uds) = CF ÷ MCu = ${fmtM(cf)} ÷ ${fmtM(mcu_v)} = ${pe_uds > 0 ? fmt(pe_uds,1) : '—'} unidades</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+      <div class="result-highlight"><div class="rh-label">PE en Unidades / Mes</div><div class="rh-val">${pe_uds > 0 ? fmt(pe_uds,1) + ' uds' : '—'}</div></div>
+      <div class="result-highlight green-hl"><div class="rh-label">PE en Pesos / Mes</div><div class="rh-val">${pe_peso > 0 ? fmtM(pe_peso) : '—'}</div></div>
+    </div>
+    ${pe_uds > 0 && ciMesR > 0 ? `<div class="status-good" style="margin-top:12px">✅ El PE (${fmt(pe_uds,1)} uds) representa el ${fmt(pe_uds/ciMesR*100,1)}% de la Capacidad Instalada. ${pe_uds <= ciMesR * 0.7 ? 'Es alcanzable y viable.' : 'Está por encima del 70% de la CI — requiere atención.'}</div>` : ''}
+  </div>
+</div>
+
+<!-- MÓDULO 5: COSTEO -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">5</div><div class="sh-title">Hoja de Costeo Unitario</div><div class="sh-sub">Módulo 05</div></div>
+  <div class="section-body">
+    <p style="font-weight:700;color:#1A3A5C;margin-bottom:6px">A. Materia Prima Directa (MPD)</p>
+    <table><thead><tr><th>Insumo</th><th>Unidad</th><th style="text-align:right">Cantidad</th><th style="text-align:right">Costo unit.</th><th style="text-align:right">Subtotal</th></tr></thead>
+      <tbody>${mpdRowsHTML}</tbody>
+      <tfoot><tr><td colspan="4">SUBTOTAL MPD</td><td style="text-align:right">${fmtM(mpd_t)}</td></tr></tfoot>
+    </table>
+    <p style="font-weight:700;color:#1A3A5C;margin:12px 0 6px">B. Mano de Obra Directa (MOD)</p>
+    <table><thead><tr><th>Actividad</th><th>Responsable</th><th style="text-align:right">Tiempo (hrs)</th><th style="text-align:right">Tarifa ($/hr)</th><th style="text-align:right">Subtotal</th></tr></thead>
+      <tbody>${modRowsHTML}</tbody>
+      <tfoot><tr><td colspan="4">SUBTOTAL MOD</td><td style="text-align:right">${fmtM(mod_t)}</td></tr></tfoot>
+    </table>
+    <p style="font-weight:700;color:#1A3A5C;margin:12px 0 6px">C. Gastos Indirectos de Fabricación (GIF)</p>
+    <table><thead><tr><th>Concepto</th><th>Base de cálculo</th><th style="text-align:right">Costo/unidad</th></tr></thead>
+      <tbody>${gifRowsHTML}</tbody>
+      <tfoot><tr><td colspan="2">SUBTOTAL GIF</td><td style="text-align:right">${fmtM(gif_t)}</td></tr></tfoot>
+    </table>
+    <hr>
+    <table><tbody>
+      <tr><td>Costo de Producción Unitario (MPD+MOD+GIF)</td><td style="text-align:right;font-weight:700">${fmtM(cpu)}</td></tr>
+      <tr><td>Gastos de Adm. y Ventas (${fmt(pctAdm*100,0)}%)</td><td style="text-align:right">${fmtM(adm)}</td></tr>
+      <tr style="background:#D6E8F7"><td style="font-weight:800;color:#1A3A5C">COSTO TOTAL UNITARIO</td><td style="text-align:right;font-weight:800;color:#1A3A5C">${fmtM(ctu)}</td></tr>
+      <tr><td>Margen de utilidad deseado (${fmt(pctUtil*100,0)}%)</td><td style="text-align:right">${fmtM(margen)}</td></tr>
+    </tbody></table>
+    <div class="result-highlight green-hl" style="margin-top:10px"><div class="rh-label">💲 PRECIO DE VENTA SUGERIDO</div><div class="rh-val">${fmtM(pv_sug)}</div></div>
+  </div>
+</div>
+
+<!-- MÓDULO 7: PE MULTI -->
+<div class="section">
+  <div class="section-head"><div class="sh-num">7</div><div class="sh-title">Punto de Equilibrio Multi-Producto</div><div class="sh-sub">Módulo 07</div></div>
+  <div class="section-body">
+    ${pemRows.length > 0 ? `
+    <div class="formula-box">MCu Ponderado = ${fmtM(pemMcuPond)} → PE Total = ${fmtM(pemCF)} ÷ ${fmtM(pemMcuPond)} = ${fmt(pemPeUds,1)} unidades</div>
+    <table><thead><tr><th>Producto</th><th style="text-align:right">PVu</th><th style="text-align:right">CVu</th><th style="text-align:right">MCu</th><th style="text-align:right">Mezcla</th><th style="text-align:right">PE (uds)</th></tr></thead>
+      <tbody>${pemRowsHTML}</tbody>
+      <tfoot><tr><td colspan="4">PE PONDERADO TOTAL</td><td style="text-align:right">${fmt(pemRows.reduce((s,r)=>s+r.mezcla,0),1)}%</td><td style="text-align:right">${fmt(pemPeUds,1)} uds</td></tr></tfoot>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div class="result-highlight"><div class="rh-label">PE Total en Unidades</div><div class="rh-val">${fmt(pemPeUds,1)} uds/mes</div></div>
+      <div class="result-highlight green-hl"><div class="rh-label">PE Total en Pesos</div><div class="rh-val">${fmtM(pemPePesos)}/mes</div></div>
+    </div>` : '<div class="status-warn">Sin datos de PE multi-producto ingresados en el Módulo 07.</div>'}
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Informe generado por la Calculadora de Análisis Técnico · Propti Analytics<br>
+  Programa de Formación Emprendedora · ${fecha}
+</div>
+
+</div>
+</body>
+</html>`;
+}
+
+function exportarHTML() {
+  const content = buildInformeHTML();
+  const empresa = document.getElementById('h-empresa').value || 'Informe';
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `Informe_Produccion_${empresa.replace(/\s+/g,'_')}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function showPDFTip() {
+  const tip = document.getElementById('pdf-tip');
+  if (tip) { tip.style.display = 'block'; }
+}
+
+function refreshPreview() {
+  const preview = document.getElementById('informe-preview');
+  const content = buildInformeHTML();
+  const bodyMatch = content.match(/<body>([\s\S]*?)<\/body>/i);
+  if (bodyMatch) {
+    const styleMatch = content.match(/<style>([\s\S]*?)<\/style>/i);
+    const styles = styleMatch ? `<style>${styleMatch[1]}</style>` : '';
+    preview.innerHTML = styles + bodyMatch[1];
+  }
+}
+
+// ── Init PEM with example data ─────────────────────────────────
+function initPEM() {
+  pemState.rows = [
+    { nombre: 'Producto A', pvu: 120, cvu: 55, mezcla: 60 },
+    { nombre: 'Producto B', pvu: 85,  cvu: 40, mezcla: 30 },
+    { nombre: 'Producto C', pvu: 200, cvu: 90, mezcla: 10 },
+  ];
+  renderPEMTable();
+}
+initPEM();
 </script>
+
 </body>
 </html>
